@@ -1,2 +1,29 @@
-.venv
-.pyc
+# Virtual environment
+.venv/
+env/
+venv/
+
+# Python bytecode
+*.pyc
+*.pyo
+__pycache__/
+
+# Logs and databases
+*.log
+*.sqlite3
+
+# Test results
+.coverage
+*.cover
+*.py,cover
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# IDE-specific files
+.vscode/
+.idea/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
