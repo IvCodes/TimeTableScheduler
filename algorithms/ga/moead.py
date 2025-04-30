@@ -7,7 +7,7 @@ import time
 import os
 from algorithms.data.loader import load_data, Activity, Group, Space # Assuming these are defined here or loaded
 from algorithms.evaluation.evaluator import evaluate_timetable # General evaluator
-from algorithms.ga.nsga2 import calculate_room_utilization # Import the function
+from algorithms.ga.nsga2 import evaluate_room_utilization # Import the function
 
 # Set random seed for reproducibility
 random.seed(42)
@@ -115,7 +115,7 @@ def crossover(parent1, parent2):
     return child1, child2
 
 # Mutation function: Apply mutation to a solution
-def mutate(timetable: Dict[int, Dict[str, Any]], activities_dict: Dict[str, Any], slots: List[int]) -> Dict[int, Dict[str, Any]]:
+def mutate(timetable: Dict[int, Dict[str, Any]], activities_dict: Dict[str, Any], slots: List[int], spaces_dict: Dict[str, Any], groups_dict: Dict[str, Any]) -> Dict[int, Dict[str, Any]]:
     """
     Apply mutation to a timetable solution.
     
@@ -123,14 +123,13 @@ def mutate(timetable: Dict[int, Dict[str, Any]], activities_dict: Dict[str, Any]
         timetable: Timetable to mutate
         activities_dict: Dictionary of activities
         slots: List of time slot IDs
+        spaces_dict: Dictionary of spaces
+        groups_dict: Dictionary of groups
         
     Returns:
         Dict[int, Dict[str, Any]]: Mutated timetable
     """
     mutated_timetable = copy.deepcopy(timetable)
-    
-    # Use globally loaded data (except slots, which is now passed)
-    global groups_dict, spaces_dict
     
     # Get all activity IDs from the global activities_dict
     all_activities = set(a.id for a in activities_dict.values()) # Use .id instead of .code
@@ -172,32 +171,55 @@ def mutate(timetable: Dict[int, Dict[str, Any]], activities_dict: Dict[str, Any]
         mutated_timetable[slot1][room1], mutated_timetable[slot2][room2] = mutated_timetable[slot2][room2], mutated_timetable[slot1][room1]
     
     elif mutation_type == 'rebalance':
-        # Calculate room utilization
-        utilization = calculate_room_utilization(mutated_timetable, spaces_dict)
-        
+        # Calculate room usage directly for rebalancing
+        room_usage = {room_id: 0 for room_id in spaces_dict.keys()}
+        for slot in slots:
+            for room_id in spaces_dict.keys():
+                if room_id in mutated_timetable[slot] and mutated_timetable[slot][room_id] is not None:
+                    room_usage[room_id] += 1
+
         # Find an overused and underused room to rebalance
-        overused_rooms = sorted(utilization['room_usage'].items(), key=lambda x: x[1], reverse=True)
-        underused_rooms = sorted(utilization['room_usage'].items(), key=lambda x: x[1])
-        
+        overused_rooms = sorted(room_usage.items(), key=lambda x: x[1], reverse=True)
+        underused_rooms = sorted(room_usage.items(), key=lambda x: x[1])
+
         if overused_rooms and underused_rooms and overused_rooms[0][1] > underused_rooms[0][1]:
             over_room_id = overused_rooms[0][0]
             under_room_id = underused_rooms[0][0]
+
+            # Find slots where the overused room has an activity
+            source_slots_for_over_room = [
+                s for s in slots 
+                if over_room_id in mutated_timetable.get(s, {}) and mutated_timetable[s][over_room_id] is not None
+            ]
+
+            if not source_slots_for_over_room:
+                return mutated_timetable # Cannot find an activity to move
             
-            # Find a slot where the overused room has an activity
-            valid_slots = [s for s in slots if s not in activity_slots[activity_id]]
+            source_slot = random.choice(source_slots_for_over_room)
+            activity_to_move = mutated_timetable[source_slot][over_room_id]
             
-            if valid_slots:
-                target_slot = random.choice(valid_slots)
+            if not activity_to_move: # Should not happen based on filter, but safe check
+                return mutated_timetable
                 
-                # Move activity from overused to underused room
-                if under_room_id in mutated_timetable[target_slot] and mutated_timetable[target_slot][under_room_id] is None:
-                    activity = mutated_timetable[target_slot][over_room_id]
-                    # Check if the room is suitable for the activity
-                    activity_size = get_classsize(activity, groups_dict) if activity else 0
-                    
-                    if activity and spaces_dict[under_room_id].size >= activity_size:
-                        mutated_timetable[target_slot][under_room_id] = activity
-                        mutated_timetable[target_slot][over_room_id] = None
+            # Find potential target slots where the underused room is free
+            potential_target_slots = [
+                s for s in slots
+                if under_room_id in mutated_timetable.get(s, {}) and mutated_timetable[s][under_room_id] is None
+            ]
+            
+            if not potential_target_slots:
+                return mutated_timetable # Cannot find a free slot in the underused room
+                
+            target_slot = random.choice(potential_target_slots)
+
+            # Check if the room is suitable for the activity
+            activity_size = get_classsize(activity_to_move, groups_dict) 
+            under_room_capacity = spaces_dict[under_room_id].size
+
+            if under_room_capacity >= activity_size:
+                # Perform the move
+                mutated_timetable[target_slot][under_room_id] = activity_to_move
+                mutated_timetable[source_slot][over_room_id] = None
     
     elif mutation_type == 'fill_unused':
         # Try to find an unassigned activity and place it in an unused room
@@ -508,8 +530,8 @@ def run_moead_optimizer(activities_dict, groups_dict, spaces_dict, slots,
                 child1, child2 = copy.deepcopy(parent1), copy.deepcopy(parent2)
             
             # Apply mutation
-            child1 = mutate(child1, activities_dict, slots) # Pass activities_dict and slots
-            child2 = mutate(child2, activities_dict, slots) # Pass activities_dict and slots
+            child1 = mutate(child1, activities_dict, slots, spaces_dict, groups_dict) # Pass spaces_dict and groups_dict
+            child2 = mutate(child2, activities_dict, slots, spaces_dict, groups_dict) # Pass spaces_dict and groups_dict
             
             # Evaluate children
             child1_fitness = evaluator(child1, activities_dict, groups_dict, spaces_dict)

@@ -23,40 +23,36 @@ from algorithms.plotting.reviewer_plots import generate_all_paper_plots
 # Define experiment parameters
 GA_PARAMS = {
     'nsga2': {
-        'population_size': 100,  # Increased from 25
-        'num_generations': 50,   # Increased from 10
+        'population_size': 20,  # Increased from 25
+        'num_generations': 10,   # Increased from 10
         'crossover_rate': 0.8,
         'mutation_rate': 0.1
     },
     'spea2': {
-        'population_size': 100,
-        'generations': 50,       # Parameter name is 'generations', not 'num_generations'
+        'population_size': 10,
+        'num_generations': 20,       # Renamed from 'generations'
         'enable_plotting': False, # Additional parameter needed
         'output_dir': 'output/GA'  # Adding output_dir parameter which is actually accepted
     },
     'moead': {
-        'population_size': 100,
-        'generations': 50        # Parameter name is 'generations'
-        # MOEAD uses a different calling convention - its additional parameters will be handled in run_algorithm
+        'population_size': 20,
+        'num_generations': 10
     }
 }
 
 RL_PARAMS = {
     'dqn': {
-        'episodes': 100,
+        'episodes': 20,
         'epsilon': 0.1,
         'learning_rate': 0.001
     },
     'sarsa': {
-        'episodes': 100,
-        'alpha': 0.1,
-        'gamma': 0.9,
+        'episodes': 20,
+        'learning_rate': 0.1,       # Renamed from 'alpha'
         'epsilon': 0.1
     },
     'qlearning': {
-        'episodes': 100,
-        'alpha': 0.1,
-        'gamma': 0.9,
+        'episodes': 20,
         'epsilon': 0.1
     }
 }
@@ -148,10 +144,10 @@ def main():
     # Run GA experiments
     run_all_ga_experiments()
     
-    # Run RL experiments
+   # Run RL experiments (Commented out for GA debugging)
     run_all_rl_experiments()
     
-    # Generate visualizations
+    #Generate visualizations (Commented out for GA debugging)
     generate_visualizations()
     
     elapsed_time = time.time() - start_time

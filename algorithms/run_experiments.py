@@ -19,8 +19,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from algorithms.data.loader import load_data
 from algorithms.metrics.tracker import MetricsTracker
-from algorithms.evaluation.evaluator import evaluate_timetable
-
+from algorithms.evaluation.evaluator import evaluate_soft_constraints
 
 class ActivityEncoder(JSONEncoder):
     """
@@ -105,20 +104,21 @@ def calculate_room_utilization(timetable, spaces_dict, slots):
         'utilization_by_room': {room_id: 100.0 * usage / total_slots for room_id, usage in room_usage.items()}
     }
 
-def evaluate_solution(timetable, dataset_path):
+def evaluate_solution(timetable, activities_dict, groups_dict, spaces_dict, lecturers_dict, slots):
     """
     Evaluate a timetable solution against the dataset constraints.
     
     Parameters:
         timetable (dict): The timetable to evaluate
-        dataset_path (str): Path to the dataset file
+        activities_dict (dict): Dictionary of activities
+        groups_dict (dict): Dictionary of groups
+        spaces_dict (dict): Dictionary of spaces
+        lecturers_dict (dict): Dictionary of lecturers
+        slots (list): List of time slots
         
     Returns:
         tuple: (hard_violations, unassigned_activities, soft_score)
     """
-    # Load the dataset
-    activities_dict, groups_dict, spaces_dict, _, slots = load_data(dataset_path)
-    
     # Calculate hard violations
     vacant_room = 0
     prof_conflicts = 0
@@ -173,8 +173,8 @@ def evaluate_solution(timetable, dataset_path):
     )
     
     # Calculate soft constraints based on student and lecturer metrics
-    # Generate a simple soft constraint evaluation
-    
+    individual_soft_scores, soft_score = evaluate_soft_constraints(timetable, groups_dict, lecturers_dict, slots)
+
     # Print detailed evaluation results
     print("\n--- Hard Constraint Evaluation Results ---")
     print(f"Vacant Rooms Count: {vacant_room}")
@@ -182,31 +182,23 @@ def evaluate_solution(timetable, dataset_path):
     print(f"Student Group Conflict Violations: {sub_group_conflicts}")
     print(f"Room Capacity Violations: {room_size_conflicts}")
     print(f"Unassigned Activity Violations: {unassigned_activities}")
-    print(f"\nTotal Hard Constraint Violations: {hard_violations}")
-    
-    # Generate a simple soft constraint evaluation
-    student_fatigue = 0.75 + random.random() * 0.1 - 0.05
-    student_idle = 0.60 + random.random() * 0.15 - 0.05
-    student_spread = 0.75 + random.random() * 0.1 - 0.05
-    lecturer_fatigue = 0.70 + random.random() * 0.1 - 0.05
-    lecturer_idle = 0.75 + random.random() * 0.1 - 0.05
-    lecturer_spread = 0.70 + random.random() * 0.1 - 0.05
-    workload_balance = random.random() * 0.15
-    
-    soft_score = (student_fatigue + student_idle + student_spread + 
-                 lecturer_fatigue + lecturer_idle + lecturer_spread + 
-                 workload_balance) / 7.0
     
     print("\n--- Soft Constraint Evaluation Results ---")
-    print(f"Student Fatigue Factor: {student_fatigue:.2f}")
-    print(f"Student Idle Time Factor: {student_idle:.2f}")
-    print(f"Student Lecture Spread Factor: {student_spread:.2f}")
-    print(f"Lecturer Fatigue Factor: {lecturer_fatigue:.2f}")
-    print(f"Lecturer Idle Time Factor: {lecturer_idle:.2f}")
-    print(f"Lecturer Lecture Spread Factor: {lecturer_spread:.2f}")
-    print(f"Lecturer Workload Balance Factor: {workload_balance:.2f}")
-    print(f"\nFinal Soft Constraint Score: {soft_score:.2f}")
-    
+    # Check if individual_soft_scores is a tuple and has the expected length
+    if isinstance(individual_soft_scores, tuple) and len(individual_soft_scores) == 7:
+        print(f"Student Fatigue Factor: {individual_soft_scores[0]:.2f}")
+        print(f"Student Idle Time Factor: {individual_soft_scores[1]:.2f}")
+        print(f"Student Lecture Spread Factor: {individual_soft_scores[2]:.2f}")
+        print(f"Lecturer Fatigue Factor: {individual_soft_scores[3]:.2f}")
+        print(f"Lecturer Idle Time Factor: {individual_soft_scores[4]:.2f}")
+        print(f"Lecturer Lecture Spread Factor: {individual_soft_scores[5]:.2f}")
+        print(f"Lecturer Workload Balance: {individual_soft_scores[6]:.2f}")
+        print(f"\nOverall Soft Score: {soft_score:.4f}") # Already correct
+    else:
+        print("Could not unpack individual soft scores. Received:", individual_soft_scores)
+        print(f"\nOverall Soft Score: {soft_score:.4f}") # Still print the overall score
+
+    # Return the results
     return hard_violations, unassigned_activities, soft_score
 
 def save_results(timetable, metrics, filename):
@@ -243,12 +235,12 @@ def save_results(timetable, metrics, filename):
     with open(filename, 'w') as f:
         json.dump(result, f, indent=2)
 
-def run_algorithm(algorithm, dataset_path, output_dir, algorithm_params=None):
+def run_algorithm(algorithm_name, dataset_path, output_dir, algorithm_params=None):
     """
     Run the specified algorithm with the specified parameters.
     
     Parameters:
-        algorithm (str): Name of the algorithm to run
+        algorithm_name (str): Name of the algorithm to run
         dataset_path (str): Path to the dataset file
         output_dir (str): Directory to save outputs
         algorithm_params (dict): Parameters for the algorithm
@@ -270,73 +262,84 @@ def run_algorithm(algorithm, dataset_path, output_dir, algorithm_params=None):
     algo_params = algorithm_params.copy() # Work with a copy
     algo_params.pop('generations', None)
     algo_params.pop('num_generations', None)
-    algo_params['num_generations'] = 150 # Set the desired number of generations
+    # Removed default 'num_generations': 150
     
-    # Add the output directory to the parameters
-    algo_params['output_dir'] = output_dir
+    # Conditionally add output_dir only if it's a GA algorithm
+    ga_algorithms = {'nsga2', 'spea2', 'moead'}
+    if algorithm_name in ga_algorithms:
+        algo_params['output_dir'] = output_dir
     
     # Log the algorithm and parameters
-    print(f"\nRunning {algorithm} on {os.path.basename(dataset_path)}...")
+    print(f"\nRunning {algorithm_name} on {os.path.basename(dataset_path)}...")
     
     # Load dataset without verbose logging
     print(f"Loading dataset {os.path.basename(dataset_path)}...")
-    activities_dict, groups_dict, spaces_dict, _, slots = load_data(dataset_path)
+    activities_dict, groups_dict, spaces_dict, lecturers_dict, slots = load_data(dataset_path)
     room_count = len(spaces_dict)
     activity_count = len(activities_dict)
     print(f"Dataset loaded: {activity_count} activities, {room_count} rooms")
     
     # Initialize module and function based on algorithm
     run_func = None
-    if algorithm.upper() in ['NSGA2', 'SPEA2', 'MOEAD']:
+    if algorithm_name.upper() in ['NSGA2', 'SPEA2', 'MOEAD']:
         # Genetic algorithm
-        if algorithm.upper() == 'NSGA2':
+        if algorithm_name.upper() == 'NSGA2':
             from algorithms.ga.nsga2 import run_nsga2_optimizer as run_func
-        elif algorithm.upper() == 'SPEA2':
+        elif algorithm_name.upper() == 'SPEA2':
             from algorithms.ga.spea2 import run_spea2_optimizer as run_func
-        elif algorithm.upper() == 'MOEAD':
+        elif algorithm_name.upper() == 'MOEAD':
             from algorithms.ga.moead import run_moead_optimizer as run_func
             # MOEAD requires additional parameters
             algo_params['activities_dict'] = activities_dict
             algo_params['groups_dict'] = groups_dict
             algo_params['spaces_dict'] = spaces_dict
             algo_params['slots'] = slots
-    elif algorithm.upper() in ['DQN', 'SARSA', 'QLEARNING']:
+    elif algorithm_name.upper() in ['DQN', 'SARSA', 'QLEARNING']:
         # Reinforcement Learning algorithms
-        if algorithm.upper() == 'DQN':
+        if algorithm_name.upper() == 'DQN':
             from algorithms.rl.DQN_optimizer import run_dqn_optimizer as run_func
-        elif algorithm.upper() == 'SARSA':
+        elif algorithm_name.upper() == 'SARSA':
             from algorithms.rl.SARSA_optimizer import run_sarsa_optimizer as run_func
-        elif algorithm.upper() == 'QLEARNING': # Assuming 'qlearning' maps to ImplicitQlearning
+        elif algorithm_name.upper() == 'QLEARNING': # Assuming 'qlearning' maps to ImplicitQlearning
             from algorithms.rl.ImplicitQlearning_optimizer import run_implicit_qlearning_optimizer as run_func
         # RL algorithms might also need specific parameters passed, add them here if needed
-        # For now, assume they primarily use algorithm_params from the config
+        # Add data dictionaries required by RL optimizers
+        algo_params['activities_dict'] = activities_dict
+        algo_params['groups_dict'] = groups_dict
+        algo_params['spaces_dict'] = spaces_dict
+        algo_params['lecturers_dict'] = lecturers_dict
+        algo_params['slots'] = slots
+
     else:
-        print(f"Error: Algorithm '{algorithm}' is not recognized or supported.")
+        print(f"Error: Algorithm '{algorithm_name}' is not recognized or supported.")
         return {
             'execution_time': 0.0,
             'hard_violations': float('inf'),
             'soft_score': 0.0,
             'room_utilization': 0.0,
             'success': False,
-            'message': f"Algorithm '{algorithm}' not supported."
+            'message': f"Algorithm '{algorithm_name}' not supported."
         }
 
     # Ensure run_func was assigned
     if run_func is None:
-        print(f"Error: Could not find run function for algorithm '{algorithm}'.")
+        print(f"Error: Could not find run function for algorithm '{algorithm_name}'.")
         return {
             'execution_time': 0.0,
             'hard_violations': float('inf'),
             'soft_score': 0.0,
             'room_utilization': 0.0,
             'success': False,
-            'message': f"Run function for algorithm '{algorithm}' not found."
+            'message': f"Run function for algorithm '{algorithm_name}' not found."
         }
     
     # Get the algorithm parameters
     params_to_log = {k: v for k, v in algo_params.items() if k != 'activities_dict'}
     print(f"Running algorithm with parameters (excluding activities_dict for brevity): {params_to_log}")
     
+    if algorithm_params:
+        algo_params.update(algorithm_params)
+        
     # Run the algorithm with timing
     start_time = time.time()
     best_solution, metrics = run_func(**algo_params)
@@ -354,7 +357,7 @@ def run_algorithm(algorithm, dataset_path, output_dir, algorithm_params=None):
     
     # Evaluate the best solution
     print("\nGenerating evaluation metrics for best solution...")
-    hard_violations, unassigned_activities, soft_score = evaluate_solution(best_solution, dataset_path)
+    hard_violations, unassigned_activities, soft_score = evaluate_solution(best_solution, activities_dict, groups_dict, spaces_dict, lecturers_dict, slots)
     
     # Calculate room utilization statistics
     room_usage_stats = calculate_room_utilization(best_solution, spaces_dict, slots)
@@ -366,11 +369,11 @@ def run_algorithm(algorithm, dataset_path, output_dir, algorithm_params=None):
     metric_values['room_utilization'] = room_usage_stats
     
     # Save the results
-    results_file = os.path.join(output_dir, "results_{}_{}.json".format(algorithm.lower(), dataset_name))
+    results_file = os.path.join(output_dir, "results_{}_{}.json".format(algorithm_name.lower(), dataset_name))
     save_results(best_solution, metric_values, results_file)
     
     # Log the results
-    print(f"\n--- Overall Evaluation ---")
+    print("\n--- Overall Evaluation ---")
     print(f"Total Hard Constraint Violations: {hard_violations}")
     print(f"Soft Constraint Score: {soft_score:.2f}")
     print(f"Unassigned Activities: {unassigned_activities} out of {activity_count}")
@@ -411,15 +414,12 @@ def run_experiments(algorithms, datasets, output_dirs, params=None):
 
             # Run the algorithm
             run_result = run_algorithm(
-                algorithm=algo_name_lower, 
+                algorithm_name=algo_name_lower, 
                 dataset_path=dataset_path, 
                 output_dir=current_output_dir,
                 algorithm_params=algo_params
             )
             
-            # DEBUG: Check the type and value before the check
-            # print(f"DEBUG [{algo_name_lower} on {dataset_name}]: run_result type={type(run_result)}, value={run_result}")
-
             # Check if run_algorithm returned a valid result (tuple of length 2)
             if not isinstance(run_result, tuple) or len(run_result) != 2 or run_result[0] is None:
                 # Treat None, (None, None), or anything else not like (solution, metrics) as failure
@@ -429,7 +429,7 @@ def run_experiments(algorithms, datasets, output_dirs, params=None):
                 continue # Move to the next algorithm
                 
             # --- Unpacking should be safe now ---
-            best_solution, metrics = run_result
+            _, metrics = load_results(full_path) 
             # print(f"DEBUG: Unpacked successfully.") # Optional debug print
 
             # Store results (only if execution was successful)
@@ -493,12 +493,12 @@ if __name__ == "__main__":
             'archive_size': 20
         },
         'dqn': {
-            'episodes': 100,
+            'episodes': 20,
             'epsilon': 0.1,
             'learning_rate': 0.001
         },
         'sarsa': {
-            'episodes': 100,
+            'episodes': 20,
             'alpha': 0.1,
             'gamma': 0.9
         },

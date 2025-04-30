@@ -117,6 +117,7 @@ def run_implicit_qlearning_optimizer(activities_dict, groups_dict, spaces_dict, 
         metrics: Dictionary of metrics tracking the optimization process.
     """
     metrics_tracker = MetricsTracker()
+    start_time = time.time() # Record start time
     
     # Initialize best schedule and score
     best_schedule = None
@@ -206,7 +207,7 @@ def run_implicit_qlearning_optimizer(activities_dict, groups_dict, spaces_dict, 
     metrics_tracker.set_final_metrics(
         hard_violations=final_hard_violations,
         soft_score=final_soft_score,
-        execution_time=time.time() - metrics_tracker.start_time
+        execution_time=time.time() - start_time # Calculate and pass duration
     )
     
     # Return the best schedule and metrics
