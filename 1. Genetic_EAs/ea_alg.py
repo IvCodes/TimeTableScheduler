@@ -1,20 +1,28 @@
-# scheduler_ga.py
-# Consolidated script for GA-based timetable scheduling (NSGA-II, SPEA2, MOEA/D)
-# Aligned with multi-objective evaluation from notebooks.
+"""Evolutionary Algorithm implementation for timetable scheduling optimization.
+
+This module implements multiple evolutionary algorithms (NSGA-II, SPEA2, MOEA/D) 
+for solving the University Timetabling Problem with multi-objective optimization.
+"""
 
 import os
-import math
-import time
-import random
-import json
-import pandas as pd
+import argparse  # For command-line arguments
 import copy
-from collections import defaultdict
+import json
+import math
+import random
+import time
+
+# Third-party imports
 import matplotlib.pyplot as plt
 import numpy as np
-from pprint import pprint
-import argparse  # For command-line arguments
-import math  # For MOEA/D helper
+import pandas as pd
+
+# === Constants for frequently used strings ===
+PROFESSOR_CONFLICTS = "Professor Conflicts"
+GROUP_CONFLICTS = "Group Conflicts"
+ROOM_CONFLICTS = "Room Conflicts"
+UNASSIGNED_ACTIVITIES = "Unassigned Activities"
+SOFT_CONSTRAINTS = "Soft Constraints"
 
 # === Data Classes ===
 
@@ -39,9 +47,9 @@ class Group:
 
 class Activity:
     def __init__(self, id=None, code=None, subject=None, name=None,
-                 teacher_id=None, lecturer=None, teacher_ids=None,  # Added teacher_ids
-                 group_ids=None, group=None, subgroup_ids=None,  # Added subgroup_ids
-                 duration=1, type=None,  # Added type
+                 teacher_id=None, lecturer=None, teacher_ids=None,
+                 group_ids=None, group=None, subgroup_ids=None,
+                 duration=1, type=None,
                  **kwargs):
         self.id = id or code
         self.subject = subject or name
@@ -54,9 +62,9 @@ class Activity:
         self.group_ids = group_ids or subgroup_ids or (
             [group.id] if group else [])
         self.duration = duration
-        self.type = type  # Store activity type (e.g., Lecture, Lab)
-        self.lecturer = lecturer  # Keep reference if available
-        self.group = group  # Keep reference if available
+        self.type = type
+        self.lecturer = lecturer
+        self.group = group
 
     def __repr__(self):
         return f"Activity(id={self.id}, subject={self.subject}, teacher_id={self.teacher_id}, group_ids={self.group_ids}, duration={self.duration})"
@@ -161,8 +169,8 @@ def evaluate_hard_constraints(timetable, activities_dict, groups_dict, spaces_di
             elif room not in spaces_dict:
                 # Handle case where room ID might be invalid (optional logging)
                 # print(f"Warning: Room '{room}' in timetable but not in spaces_dict during hard constraint check.")
-                # Penalize if room doesn't exist
-                violations['room_size_conflicts'] += 1
+                # Create a separate violation category for non-existent rooms
+                violations['invalid_room_assignments'] = violations.get('invalid_room_assignments', 0) + 1
 
     violations['unassigned'] = len(activities_dict) - len(activities_set)
     return violations
@@ -189,11 +197,11 @@ def evaluate_soft_constraints(schedule, groups_dict, lecturers_dict, slots, acti
     scheduled_activities = set() if activities_dict else None
 
     for slot, rooms in schedule.items():
-        for room, activity in rooms.items():
+        for _, activity in rooms.items():  # Room ID not used in this loop
             if not isinstance(activity, Activity):
                 continue
                 
-            # Track scheduled activity if activities_dict is provided
+            # Track scheduled activities when provided
             if scheduled_activities is not None and hasattr(activity, 'id'):
                 scheduled_activities.add(activity.id)
 
@@ -390,7 +398,6 @@ def generate_initial_population(pop_size, slots, activities_dict, spaces_dict, g
         # This maintains some randomness while prioritizing harder-to-place activities
         random.shuffle(activities_to_schedule)
 
-        scheduled_count = 0
         unscheduled_ids = set()  # Track which activities couldn't be scheduled
         
         # First pass: Try to schedule all activities with hard constraints
@@ -429,7 +436,6 @@ def generate_initial_population(pop_size, slots, activities_dict, spaces_dict, g
                 chosen_slot, chosen_room = random.choice(potential_placements)
                 timetable[chosen_slot][chosen_room] = activity
                 activity_slots[activity_id].append(chosen_slot)
-                scheduled_count += 1
             else:
                 unscheduled_ids.add(activity_id)
         
@@ -450,7 +456,6 @@ def generate_initial_population(pop_size, slots, activities_dict, spaces_dict, g
                             # Schedule regardless of room size
                             timetable[slot][room_id] = activity
                             activity_slots[activity_id].append(slot)
-                            scheduled_count += 1
                             unscheduled_ids.remove(activity_id)
                             break
                     
@@ -607,9 +612,7 @@ def pareto_frontier(points):
 
     # Ensure pts is 2D, even if only one point is passed
     if pts.ndim == 1:
-        # This case might occur if only one solution is passed.
-        # Reshape assumes objectives are columns.
-        # If pts was originally [obj1, obj2, ...], reshape to [[obj1, obj2, ...]]
+    
         if len(pts) > 0:  # Check if it's not truly empty after conversion
             pts = pts.reshape(1, -1)
         else:  # If conversion resulted in a truly empty 1D array
@@ -620,10 +623,7 @@ def pareto_frontier(points):
 
     # Compare each point against all other points
     for i, p in enumerate(pts):
-        # Check if point p is dominated by any other point q
-        # A point p is dominated if there exists another point q such that:
-        # q[k] <= p[k] for all objectives k, AND q[j] < p[j] for at least one objective j.
-        # Vectorized check:
+    
         # Check points before i
         if i > 0:
             if np.any(np.all(pts[:i] <= p, axis=1) & np.any(pts[:i] < p, axis=1)):
@@ -1036,7 +1036,7 @@ def select_mating_pool(archive, archive_fitness, pool_size):
         return [archive[0]] * pool_size
 
     # Calculate fitness for tournament (lower is better)
-    # Need strength, raw, density for archive members relative to themselves + population?
+    # Need strength, raw, density for archive members relative to themselves + population
     # Simpler: Use the final_fitness calculated during environmental selection if available
     # For now, use a simple tournament based on the objectives directly
     # This assumes archive_fitness contains the multi-objective tuples
@@ -1160,6 +1160,7 @@ def spea2(pop_size, archive_size, generations, activities_dict, groups_dict, lec
     print("SPEA2 Complete!")
     # Return the final archive members and their fitness
     return archive, archive_fitness
+    
 # === MOEA/D Helpers (Copied/Adapted from scheduler_ga.py) ===
 # (Assuming these functions correctly handle the 5-objective fitness tuple)
 
@@ -1233,7 +1234,7 @@ def moead(pop_size, generations, activities_dict, groups_dict, lecturers_dict, s
                 k, l = random.sample(neighborhoods[i], 2)
 
             if random.random() < CROSSOVER_RATE_MOEA:
-                c1, c2 = crossover(population[k], population[l])
+                c1, _ = crossover(population[k], population[l])
                 child = c1
             else:
                 child = copy.deepcopy(population[k])
@@ -1423,11 +1424,11 @@ def plot_combined_pareto(fitness_sets, names, colors, markers, output_dir,
     
     # Identify objective meanings for this plot
     obj_meanings = {
-        0: "Professor Conflicts",
-        1: "Group Conflicts",
-        2: "Room Conflicts",
-        3: "Unassigned Activities",
-        4: "Soft Constraints"
+        0: PROFESSOR_CONFLICTS,
+        1: GROUP_CONFLICTS,
+        2: ROOM_CONFLICTS,
+        3: UNASSIGNED_ACTIVITIES,
+        4: SOFT_CONSTRAINTS
     }
     
     # Get proper axis labels with units
@@ -1750,20 +1751,17 @@ if __name__ == "__main__":
         
         # Loop through each algorithm's fitness set
         for i, (fitness_set, name) in enumerate(zip(fitness_sets, names)):
-            # Convert each fitness tuple to a dictionary for easier readability
             solutions = []
-            for solution in fitness_set:
-                # Create a dictionary with named objectives
-                solution_dict = {
-                    "professor_conflicts": solution[0],
-                    "group_conflicts": solution[1],
-                    "room_conflicts": solution[2],
-                    "unassigned_activities": solution[3],
-                    "soft_constraints": solution[4]
+            for fitness in fitness_set:
+                # Map fitness tuple to named objectives dictionary for JSON
+                solution = {
+                    "professor_conflicts": fitness[0],
+                    "group_conflicts": fitness[1],
+                    "room_conflicts": fitness[2],
+                    "unassigned": fitness[3],
+                    "soft_score": 1 - fitness[4]  # Convert back from 1-soft_score format
                 }
-                solutions.append(solution_dict)
-            
-            # Add this algorithm's solutions to the data dictionary
+                solutions.append(solution)
             data[name] = solutions
         
         # Write the data to a JSON file
@@ -2038,7 +2036,7 @@ def create_parallel_coordinates_plot(fitness_sets, names, colors, output_dir):
     all_data = []
     algorithm_indices = []
     
-    for i, (fitness_set, name) in enumerate(zip(fitness_sets, names)):
+    for i, (fitness_set, _) in enumerate(zip(fitness_sets, names)):
         for solution in fitness_set:
             # Convert tuple to list for parallel coordinates
             row = list(solution)
@@ -2214,7 +2212,7 @@ parallel_plot_path = create_parallel_coordinates_plot(
 
 # --- Final Comparison ---
 print("\n--- Final Comparison ---")
-print(f"Algorithm execution times:")
+print("Algorithm execution times:")
 print(f"NSGA-II: {nsga2_execution_time:.2f} seconds")
 print(f"SPEA2:   {spea2_execution_time:.2f} seconds")
 print(f"MOEA/D:  {moead_execution_time:.2f} seconds")
