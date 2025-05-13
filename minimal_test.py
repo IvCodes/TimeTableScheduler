@@ -16,16 +16,27 @@ from common.evaluator import evaluate_schedule, multi_objective_evaluator
 
 dataset_path = "Dataset/sliit_computing_dataset_balanced.json"  # Use the balanced dataset for testing
 
-# Add __hash__ method to Activity class to make it hashable
+# Add __hash__ method to Activity class and fix attribute compatibility
 def make_dataclasses_hashable():
     """Add __hash__ method to dataclasses to make them hashable."""
     def hash_method(self):
         return hash(self.id)
     
+    # Add hash method to make classes hashable
     Activity.__hash__ = hash_method
     Group.__hash__ = hash_method
     Space.__hash__ = hash_method
     Lecturer.__hash__ = hash_method
+    
+    # Add compatibility for teacher_id / lecturer_id differences
+    def activity_teacher_id_getter(self):
+        return self.lecturer_id
+    
+    def activity_teacher_id_setter(self, value):
+        self.lecturer_id = value
+    
+    # Add teacher_id property to Activity class for GA compatibility
+    Activity.teacher_id = property(activity_teacher_id_getter, activity_teacher_id_setter)
 
 # Functions to run minimal GA test
 def run_minimal_ga_test():
@@ -38,8 +49,15 @@ def run_minimal_ga_test():
     # Load data
     try:
         print("Loading data for GA test...")
-        spaces_dict, groups_dict, activities_dict, lecturers_dict, slots = load_data()[:5]
-        print(f"Loaded: {len(activities_dict)} activities, {len(spaces_dict)} spaces")
+        # Get the correct order from load_data
+        data = load_data()
+        activities_dict = data[0]  # First element is activities_dict
+        groups_dict = data[1]      # Second element is groups_dict
+        spaces_dict = data[2]      # Third element is spaces_dict
+        lecturers_dict = data[3]   # Fourth element is lecturers_dict
+        slots = data[12]           # Last element (13th) is slots
+        
+        print(f"Loaded: {len(activities_dict)} activities, {len(spaces_dict)} spaces, {len(groups_dict)} groups, {len(lecturers_dict)} lecturers")
     except Exception as e:
         print(f"Error loading data for GA: {str(e)}")
         return False
