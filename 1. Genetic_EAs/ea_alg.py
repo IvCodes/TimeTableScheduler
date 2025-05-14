@@ -16,6 +16,10 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from scipy.spatial import ConvexHull
+import psutil
+import itertools
+from scipy import stats
 
 # === Constants for frequently used strings ===
 PROFESSOR_CONFLICTS = "Professor Conflicts"
@@ -23,6 +27,264 @@ GROUP_CONFLICTS = "Group Conflicts"
 ROOM_CONFLICTS = "Room Conflicts"
 UNASSIGNED_ACTIVITIES = "Unassigned Activities"
 SOFT_CONSTRAINTS = "Soft Constraints"
+
+# === Performance Metrics and Statistical Analysis ===
+
+def calculate_hypervolume(pareto_front, reference_point):
+    """
+    Calculate the hypervolume indicator for a Pareto front.
+    
+    A higher hypervolume indicates a better Pareto front (better coverage, diversity, and convergence).
+    
+    Args:
+        pareto_front: List of objective vectors (each a tuple of objective values)
+        reference_point: Reference point (worst values for each objective)
+        
+    Returns:
+        float: Hypervolume value
+    """
+    if not pareto_front or len(pareto_front) < 3:  # Need at least 3 points for ConvexHull
+        # Fallback for small fronts: approximate with rectangular volumes
+        return simple_hypervolume(pareto_front, reference_point)
+    
+    try:
+        # Convert to numpy array for hull calculation
+        points = np.array(pareto_front)
+        # Add reference point to create closed volume
+        points_with_ref = np.vstack([points, reference_point])
+        hull = ConvexHull(points_with_ref)
+        return hull.volume
+    except Exception as e:
+        print(f"Error calculating hypervolume: {e}")
+        return simple_hypervolume(pareto_front, reference_point)
+
+
+def simple_hypervolume(pareto_front, reference_point):
+    """
+    Simplified hypervolume calculation for small fronts or when ConvexHull fails.
+    
+    Args:
+        pareto_front: List of objective vectors (each a tuple of objective values)
+        reference_point: Reference point (worst values for each objective)
+        
+    Returns:
+        float: Approximate hypervolume value
+    """
+    if not pareto_front:
+        return 0.0
+        
+    total_volume = 0.0
+    for point in pareto_front:
+        # Calculate volume of hypercube from point to reference
+        volume = 1.0
+        for i, value in enumerate(point):
+            volume *= max(0, reference_point[i] - value)
+        total_volume += volume
+    return total_volume
+
+
+def calculate_igd(pareto_front, reference_front):
+    """
+    Calculate Inverted Generational Distance (IGD).
+    
+    Lower IGD indicates a Pareto front that is closer to the reference front.
+    
+    Args:
+        pareto_front: List of objective vectors from algorithm
+        reference_front: True Pareto front or best-known front
+        
+    Returns:
+        float: IGD value
+    """
+    if not pareto_front or not reference_front:
+        return float('inf')
+        
+    total_distance = 0.0
+    
+    for ref_point in reference_front:
+        # Find minimum distance from ref_point to any point in pareto_front
+        min_distance = float('inf')
+        for point in pareto_front:
+            # Euclidean distance
+            distance = np.sqrt(sum((r - p) ** 2 for r, p in zip(ref_point, point)))
+            min_distance = min(min_distance, distance)
+        total_distance += min_distance
+        
+    return total_distance / len(reference_front)
+
+
+def calculate_spread(pareto_front):
+    """
+    Calculate spread (diversity) of the Pareto front.
+    
+    Lower spread value indicates more uniform distribution of solutions.
+    
+    Args:
+        pareto_front: List of objective vectors
+        
+    Returns:
+        float: Spread value
+    """
+    if len(pareto_front) < 2:
+        return 0.0
+        
+    # Sort by first objective
+    sorted_front = sorted(pareto_front, key=lambda x: x[0])
+    
+    # Calculate distances between adjacent solutions
+    distances = []
+    for i in range(len(sorted_front) - 1):
+        dist = np.sqrt(sum((sorted_front[i][j] - sorted_front[i+1][j]) ** 2 
+                          for j in range(len(sorted_front[0]))))
+        distances.append(dist)
+    
+    # Calculate spread metric
+    mean_dist = np.mean(distances)
+    if mean_dist == 0:
+        return 0.0  # Avoid division by zero
+        
+    sum_dev = sum(abs(d - mean_dist) for d in distances)
+    
+    return sum_dev / ((len(sorted_front) - 1) * mean_dist)
+
+
+def calculate_gd(pareto_front, reference_front):
+    """
+    Calculate Generational Distance (GD).
+    
+    Lower GD indicates a Pareto front that is closer to the reference front.
+    
+    Args:
+        pareto_front: List of objective vectors from algorithm
+        reference_front: True Pareto front or best-known front
+        
+    Returns:
+        float: GD value
+    """
+    if not pareto_front or not reference_front:
+        return float('inf')
+        
+    total_distance = 0.0
+    
+    for point in pareto_front:
+        # Find minimum distance from point to any point in reference_front
+        min_distance = float('inf')
+        for ref_point in reference_front:
+            # Euclidean distance
+            distance = np.sqrt(sum((p - r) ** 2 for p, r in zip(point, ref_point)))
+            min_distance = min(min_distance, distance)
+        total_distance += min_distance ** 2
+        
+    return np.sqrt(total_distance / len(pareto_front))
+
+
+# Function to track computational resources
+# Global dictionary to store resource metrics for each algorithm run
+ALGORITHM_RESOURCE_METRICS = {}
+
+def track_computational_resources(algorithm_func):
+    """
+    Decorator to track computational resources used by algorithms.
+    
+    Unlike traditional decorators that might modify the return value,
+    this one stores metrics in a global dictionary to avoid changing
+    the function's return signature.
+    
+    Args:
+        algorithm_func: Function implementing an evolutionary algorithm
+        
+    Returns:
+        Wrapped function that tracks execution time and memory usage
+    """
+    import functools
+    
+    @functools.wraps(algorithm_func)
+    def wrapper(*args, **kwargs):
+        # Start tracking
+        start_time = time.time()
+        process = psutil.Process()
+        start_memory = process.memory_info().rss / (1024 * 1024)  # MB
+        
+        # Run algorithm
+        result = algorithm_func(*args, **kwargs)
+        
+        # End tracking
+        end_time = time.time()
+        end_memory = process.memory_info().rss / (1024 * 1024)  # MB
+        
+        # Calculate metrics
+        execution_time = end_time - start_time
+        memory_usage = end_memory - start_memory
+        
+        algorithm_name = algorithm_func.__name__.replace('run_', '').upper()
+        
+        # Store metrics in global dictionary instead of modifying the return value
+        global ALGORITHM_RESOURCE_METRICS
+        ALGORITHM_RESOURCE_METRICS[algorithm_name] = {
+            'execution_time': execution_time,
+            'memory_usage': memory_usage,
+            'algorithm': algorithm_name
+        }
+                
+        print(f"\n{algorithm_name} Performance Metrics:")
+        print(f"Execution Time: {execution_time:.2f} seconds")
+        print(f"Memory Usage: {memory_usage:.2f} MB")
+                
+        # Return original result without modification
+        return result
+        
+    return wrapper
+
+
+def perform_statistical_tests(algorithm_results, metrics=['hypervolume', 'igd', 'execution_time']):
+    """
+    Perform statistical tests to compare algorithm performance.
+    
+    Args:
+        algorithm_results: Dictionary mapping algorithm names to their results
+        metrics: List of metrics to compare
+        
+    Returns:
+        dict: Statistical test results
+    """
+    results = {}
+    
+    for metric in metrics:
+        metric_values = {alg: results[metric] for alg, results in algorithm_results.items() if metric in results}
+        
+        # Perform Kruskal-Wallis test (non-parametric ANOVA)
+        algorithms = list(metric_values.keys())
+        values = [metric_values[alg] for alg in algorithms]
+        
+        if all(len(v) > 1 for v in values):  # Need at least 2 samples per algorithm
+            h_stat, p_value = stats.kruskal(*values)
+            results[f"{metric}_kruskal"] = {
+                'statistic': h_stat,
+                'p_value': p_value,
+                'significant': p_value < 0.05
+            }
+            
+            # If significant difference found, perform pairwise Mann-Whitney U tests
+            if p_value < 0.05:
+                for alg1, alg2 in itertools.combinations(algorithms, 2):
+                    u_stat, p_value = stats.mannwhitneyu(
+                        metric_values[alg1], metric_values[alg2], alternative='two-sided')
+                    
+                    # Determine which algorithm is better for this metric
+                    # For hypervolume, higher is better; for others, lower is better
+                    if metric == 'hypervolume':
+                        better = alg1 if np.median(metric_values[alg1]) > np.median(metric_values[alg2]) else alg2
+                    else:
+                        better = alg1 if np.median(metric_values[alg1]) < np.median(metric_values[alg2]) else alg2
+                    
+                    results[f"{metric}_{alg1}_vs_{alg2}"] = {
+                        'statistic': u_stat,
+                        'p_value': p_value,
+                        'significant': p_value < 0.05,
+                        'better': better
+                    }
+    
+    return results
 
 # === Data Classes ===
 
@@ -775,6 +1037,7 @@ def selection(population, fitness_values, pop_size):
 
 # === NSGA-II Main Loop ===
 
+@track_computational_resources
 def nsga2(pop_size, generations, activities_dict, groups_dict, lecturers_dict, spaces_dict, slots):
     """Main NSGA-II algorithm with improved scheduling prioritization."""
     print(f"\n--- Running NSGA-II (Pop: {pop_size}, Gen: {generations}) ---")
@@ -1054,7 +1317,7 @@ def select_mating_pool(archive, archive_fitness, pool_size):
 
 # === SPEA2 Main Loop ===
 
-
+@track_computational_resources
 def spea2(pop_size, archive_size, generations, activities_dict, groups_dict, lecturers_dict, spaces_dict, slots):
     """SPEA2 implementation."""
     print(
@@ -1188,7 +1451,7 @@ def calculate_tchebycheff(weight, fitness, ideal_point):
 
 # === MOEA/D Main Loop ===
 
-
+@track_computational_resources
 def moead(pop_size, generations, activities_dict, groups_dict, lecturers_dict, spaces_dict, slots, n_neighbors=15, max_replacements=2):
     """MOEA/D implementation."""
     print(
@@ -1564,7 +1827,7 @@ if __name__ == "__main__":
     DATASET_DIR = os.path.join(PROJECT_ROOT, 'Dataset')
     
     if args.dataset == '4room':
-        DATASET_FILENAME = 'sliit_computing_dataset.json'
+        DATASET_FILENAME = 'sliit_computing_dataset_4.json'
         DATASET_NAME = "4-Room Dataset"
     else:  # 7room
         DATASET_FILENAME = 'sliit_computing_dataset_7.json'
@@ -1631,12 +1894,12 @@ if __name__ == "__main__":
     print("\nRunning NSGA-II algorithm...")
     output_dir_nsga2 = os.path.join(OUTPUT_DIR_BASE, 'nsga2')
     os.makedirs(output_dir_nsga2, exist_ok=True)
-    nsga2_start_time = time.time()
     nsga2_final_pop, nsga2_final_fitness = nsga2(
         pop_size=POP_SIZE_MAIN, generations=GENERATIONS_MAIN, activities_dict=activities_dict,
         groups_dict=groups_dict, lecturers_dict=lecturers_dict, spaces_dict=spaces_dict, slots=slots
     )
-    nsga2_execution_time = time.time() - nsga2_start_time
+    # Get execution time from our global metrics dictionary
+    nsga2_execution_time = ALGORITHM_RESOURCE_METRICS.get('NSGA2', {}).get('execution_time', 0.0)
     print(f"NSGA-II completed in {nsga2_execution_time:.2f} seconds")
     nsga2_indices = list(range(len(nsga2_final_fitness)))
     nsga2_fronts = non_dominated_sort(nsga2_indices, nsga2_final_fitness)
@@ -1648,13 +1911,13 @@ if __name__ == "__main__":
     print("\nRunning SPEA2 algorithm...")
     output_dir_spea2 = os.path.join(OUTPUT_DIR_BASE, 'spea2')
     os.makedirs(output_dir_spea2, exist_ok=True)
-    spea2_start_time = time.time()
     spea2_final_archive_pop, spea2_final_archive_fitness = spea2(
         pop_size=POP_SIZE_MAIN, archive_size=ARCHIVE_SIZE_MAIN, generations=GENERATIONS_MAIN,
         activities_dict=activities_dict, groups_dict=groups_dict, lecturers_dict=lecturers_dict,
         spaces_dict=spaces_dict, slots=slots
     )
-    spea2_execution_time = time.time() - spea2_start_time
+    # Get execution time from our global metrics dictionary
+    spea2_execution_time = ALGORITHM_RESOURCE_METRICS.get('SPEA2', {}).get('execution_time', 0.0)
     print(f"SPEA2 completed in {spea2_execution_time:.2f} seconds")
     spea2_indices = list(range(len(spea2_final_archive_fitness)))
     spea2_fronts = non_dominated_sort(
@@ -1668,7 +1931,6 @@ if __name__ == "__main__":
     output_dir_moead = os.path.join(OUTPUT_DIR_BASE, 'moead')
     os.makedirs(output_dir_moead, exist_ok=True)
     # Pass the new max_replacements argument
-    moead_start_time = time.time()
     moead_pareto_pop, moead_pareto_fitness = moead(
         pop_size=POP_SIZE_MAIN,
         generations=GENERATIONS_MAIN,
@@ -1680,14 +1942,139 @@ if __name__ == "__main__":
         n_neighbors=N_NEIGHBORS_MAIN,
         max_replacements=MAX_REPLACEMENTS_MAIN  # Pass the parameter
     )
-    moead_execution_time = time.time() - moead_start_time
+    # Get execution time from our global metrics dictionary
+    moead_execution_time = ALGORITHM_RESOURCE_METRICS.get('MOEAD', {}).get('execution_time', 0.0)
     print(f"MOEA/D completed in {moead_execution_time:.2f} seconds")
 
-    # Print detailed results for all algorithms
+    # === Performance Metrics Calculation ===
+    print("\n--- Advanced Performance Metrics ---")
+    
+    # Define a reference point (worst case + margin) for hypervolume calculation
+    # Combine all solutions to find maximum values
+    all_fitness = nsga2_pareto_fitness + spea2_pareto_fitness + moead_pareto_fitness
+    if all_fitness:
+        max_values = [max(fitness[i] for fitness in all_fitness) for i in range(NUM_OBJECTIVES_GA)]
+        # Add margin to max values
+        reference_point = [value * 1.1 for value in max_values]  # 10% margin
+    else:
+        # Fallback reference point if no solutions found
+        reference_point = [100, 100, 100, 100, 1.0]
+    
+    # Calculate metrics for each algorithm
+    print("\nCalculating hypervolume indicator...")
+    nsga2_hypervolume = calculate_hypervolume(nsga2_pareto_fitness, reference_point)
+    spea2_hypervolume = calculate_hypervolume(spea2_pareto_fitness, reference_point)
+    moead_hypervolume = calculate_hypervolume(moead_pareto_fitness, reference_point)
+    
+    print("Calculating spread/diversity metric...")
+    nsga2_spread = calculate_spread(nsga2_pareto_fitness)
+    spea2_spread = calculate_spread(spea2_pareto_fitness)
+    moead_spread = calculate_spread(moead_pareto_fitness)
+    
+    # Combine all Pareto solutions for reference front
+    # Note: This is a simple approach; in real scenarios, you'd use a true reference front
+    combined_pareto = nsga2_pareto_fitness + spea2_pareto_fitness + moead_pareto_fitness
+    # Remove dominated solutions from combined set
+    if combined_pareto:
+        combined_pareto_indices = pareto_frontier(combined_pareto)
+        reference_front = [combined_pareto[i] for i in combined_pareto_indices]
+    else:
+        reference_front = []
+    
+    print("Calculating IGD and GD metrics...")
+    nsga2_igd = calculate_igd(nsga2_pareto_fitness, reference_front) if reference_front else float('inf')
+    spea2_igd = calculate_igd(spea2_pareto_fitness, reference_front) if reference_front else float('inf')
+    moead_igd = calculate_igd(moead_pareto_fitness, reference_front) if reference_front else float('inf')
+    
+    nsga2_gd = calculate_gd(nsga2_pareto_fitness, reference_front) if reference_front else float('inf')
+    spea2_gd = calculate_gd(spea2_pareto_fitness, reference_front) if reference_front else float('inf')
+    moead_gd = calculate_gd(moead_pareto_fitness, reference_front) if reference_front else float('inf')
+    
+    # Calculate convergence speed (final hypervolume / execution time)
+    nsga2_conv_speed = nsga2_hypervolume / nsga2_execution_time if nsga2_execution_time > 0 else 0
+    spea2_conv_speed = spea2_hypervolume / spea2_execution_time if spea2_execution_time > 0 else 0
+    moead_conv_speed = moead_hypervolume / moead_execution_time if moead_execution_time > 0 else 0
+    
+    # Merge all metrics into a comprehensive dictionary for easy reporting
+    # First get resource metrics from our global tracker
+    nsga2_memory_usage = ALGORITHM_RESOURCE_METRICS.get('NSGA2', {}).get('memory_usage', 0.0)
+    spea2_memory_usage = ALGORITHM_RESOURCE_METRICS.get('SPEA2', {}).get('memory_usage', 0.0)
+    moead_memory_usage = ALGORITHM_RESOURCE_METRICS.get('MOEAD', {}).get('memory_usage', 0.0)
+    
+    algorithm_metrics = {
+        "NSGA-II": {
+            "pareto_size": len(nsga2_pareto_fitness),
+            "hypervolume": nsga2_hypervolume,
+            "igd": nsga2_igd,
+            "gd": nsga2_gd,
+            "spread": nsga2_spread,
+            "execution_time": nsga2_execution_time,
+            "memory_usage": nsga2_memory_usage,
+            "convergence_speed": nsga2_conv_speed
+        },
+        "SPEA2": {
+            "pareto_size": len(spea2_pareto_fitness),
+            "hypervolume": spea2_hypervolume,
+            "igd": spea2_igd,
+            "gd": spea2_gd,
+            "spread": spea2_spread,
+            "execution_time": spea2_execution_time,
+            "memory_usage": spea2_memory_usage,
+            "convergence_speed": spea2_conv_speed
+        },
+        "MOEA/D": {
+            "pareto_size": len(moead_pareto_fitness),
+            "hypervolume": moead_hypervolume,
+            "igd": moead_igd,
+            "gd": moead_gd,
+            "spread": moead_spread,
+            "execution_time": moead_execution_time,
+            "memory_usage": moead_memory_usage,
+            "convergence_speed": moead_conv_speed
+        }
+    }
+    
+    # Print comprehensive performance summary
     print("\n--- Algorithm Performance Summary ---")
-    print(f"NSGA-II: {nsga2_execution_time:.2f} seconds, {len(nsga2_pareto_indices)} Pareto solutions")
-    print(f"SPEA2: {spea2_execution_time:.2f} seconds, {len(spea2_pareto_indices)} Pareto solutions")
-    print(f"MOEA/D: {moead_execution_time:.2f} seconds, {len(moead_pareto_fitness)} Pareto solutions")
+    metrics_table = pd.DataFrame({
+        "Metric": ["Pareto Size", "Hypervolume", "IGD", "GD", "Spread", "Execution Time (s)", "Memory Usage (MB)", "Convergence Speed"],
+        "NSGA-II": [
+            len(nsga2_pareto_fitness),
+            f"{nsga2_hypervolume:.4f}",
+            f"{nsga2_igd:.4f}",
+            f"{nsga2_gd:.4f}",
+            f"{nsga2_spread:.4f}",
+            f"{nsga2_execution_time:.2f}",
+            f"{nsga2_memory_usage:.2f}",
+            f"{nsga2_conv_speed:.4f}"
+        ],
+        "SPEA2": [
+            len(spea2_pareto_fitness),
+            f"{spea2_hypervolume:.4f}",
+            f"{spea2_igd:.4f}",
+            f"{spea2_gd:.4f}",
+            f"{spea2_spread:.4f}",
+            f"{spea2_execution_time:.2f}",
+            f"{spea2_memory_usage:.2f}",
+            f"{spea2_conv_speed:.4f}"
+        ],
+        "MOEA/D": [
+            len(moead_pareto_fitness),
+            f"{moead_hypervolume:.4f}",
+            f"{moead_igd:.4f}",
+            f"{moead_gd:.4f}",
+            f"{moead_spread:.4f}",
+            f"{moead_execution_time:.2f}",
+            f"{moead_memory_usage:.2f}",
+            f"{moead_conv_speed:.4f}"
+        ]
+    })
+    print(metrics_table.to_string(index=False))
+    
+    # Save metrics to CSV file for further analysis
+    metrics_file = os.path.join(OUTPUT_DIR_BASE, "performance_metrics.csv")
+    metrics_table.to_csv(metrics_file, index=False)
+    print(f"\nPerformance metrics saved to {metrics_file}")
     
     # NSGA-II Pareto Solutions
     print("\n--- NSGA-II Pareto Fitness Values ---")
@@ -1774,9 +2161,9 @@ if __name__ == "__main__":
 
 
     def create_research_quality_pareto(fitness_sets, names, colors, markers, output_dir,
-                                   obj_x_index, obj_y_index, 
-                                   obj_x_label, obj_y_label,
-                                   execution_times=None):
+                                    obj_x_index, obj_y_index, 
+                                    obj_x_label, obj_y_label,
+                                    execution_times=None, metrics=None):
         """Creates a clean, publication-ready Pareto front visualization.
         
         This refined visualization addresses key design principles:
@@ -1853,6 +2240,23 @@ if __name__ == "__main__":
         # Update axis labels to include 'Lower is Better'
         plt.xlabel(f"{obj_x_label} (Lower is Better)", fontsize=12)
         plt.ylabel(f"{obj_y_label} (Lower is Better)", fontsize=12)
+        
+        # Add performance metrics in an inset box if provided
+        if metrics:
+            metric_text = "Performance Metrics:\n"
+            for i, name in enumerate(names):
+                if name in metrics:
+                    alg_metrics = metrics[name]
+                    metric_text += f"\n{name}:\n"
+                    metric_text += f"  Hypervolume: {alg_metrics['hypervolume']:.4f}\n"
+                    metric_text += f"  IGD: {alg_metrics['igd']:.4f}\n"
+                    if 'spread' in alg_metrics:
+                        metric_text += f"  Spread: {alg_metrics['spread']:.4f}\n"
+            
+            # Add the metrics box at the top-left corner
+            props = dict(boxstyle='round', facecolor='white', alpha=0.9)
+            plt.text(0.02, 0.98, metric_text, transform=plt.gca().transAxes, fontsize=9,
+                     verticalalignment='top', horizontalalignment='left', bbox=props)
         
         # Step 5: Clean, focused legend
         # Only show the Pareto front lines in the legend (skip individual points)
@@ -2176,8 +2580,65 @@ plot_combined_pareto(
     obj_x_label=objective_labels[0], obj_y_label=objective_labels[3]
 )
 
-# New research-quality visualizations
-print("\n--- Generating Research-Quality Visualizations ---")
+# Perform statistical analysis
+print("\n--- Performing Statistical Analysis ---")
+# Prepare repeated runs data for analysis (if applicable)
+# In a real implementation, you would collect data from multiple runs
+# Here, we'll just demonstrate the function call with single-run data
+algorithm_runs = {
+    "NSGA-II": {
+        "hypervolume": [nsga2_hypervolume],
+        "igd": [nsga2_igd],
+        "execution_time": [nsga2_execution_time]
+    },
+    "SPEA2": {
+        "hypervolume": [spea2_hypervolume],
+        "igd": [spea2_igd],
+        "execution_time": [spea2_execution_time]
+    },
+    "MOEA/D": {
+        "hypervolume": [moead_hypervolume],
+        "igd": [moead_igd],
+        "execution_time": [moead_execution_time]
+    }
+}
+
+# Note: Statistical tests are meaningful only with multiple runs
+# For demonstration purposes, we'll skip actual statistical testing
+# and just report which algorithm performed best in each metric
+print("\nBest performing algorithm per metric:")
+print(f"  Hypervolume (higher is better): {max(['NSGA-II', 'SPEA2', 'MOEA/D'], key=lambda x: algorithm_metrics[x]['hypervolume'])}")
+print(f"  IGD (lower is better): {min(['NSGA-II', 'SPEA2', 'MOEA/D'], key=lambda x: algorithm_metrics[x]['igd'])}")
+print(f"  GD (lower is better): {min(['NSGA-II', 'SPEA2', 'MOEA/D'], key=lambda x: algorithm_metrics[x]['gd'])}")
+print(f"  Spread (lower is better): {min(['NSGA-II', 'SPEA2', 'MOEA/D'], key=lambda x: algorithm_metrics[x]['spread'])}")
+print(f"  Execution Time (lower is better): {min(['NSGA-II', 'SPEA2', 'MOEA/D'], key=lambda x: algorithm_metrics[x]['execution_time'])}")
+print(f"  Convergence Speed (higher is better): {max(['NSGA-II', 'SPEA2', 'MOEA/D'], key=lambda x: algorithm_metrics[x]['convergence_speed'])}")
+
+# Save analysis results to a text file
+analysis_file = os.path.join(OUTPUT_DIR_BASE, "statistical_analysis.txt")
+with open(analysis_file, 'w') as f:
+    f.write("Statistical Analysis Results\n")
+    f.write("===========================\n\n")
+    f.write("Best performing algorithm per metric:\n")
+    f.write(f"  Hypervolume (higher is better): {max(['NSGA-II', 'SPEA2', 'MOEA/D'], key=lambda x: algorithm_metrics[x]['hypervolume'])}\n")
+    f.write(f"  IGD (lower is better): {min(['NSGA-II', 'SPEA2', 'MOEA/D'], key=lambda x: algorithm_metrics[x]['igd'])}\n")
+    f.write(f"  GD (lower is better): {min(['NSGA-II', 'SPEA2', 'MOEA/D'], key=lambda x: algorithm_metrics[x]['gd'])}\n")
+    f.write(f"  Spread (lower is better): {min(['NSGA-II', 'SPEA2', 'MOEA/D'], key=lambda x: algorithm_metrics[x]['spread'])}\n")
+    f.write(f"  Execution Time (lower is better): {min(['NSGA-II', 'SPEA2', 'MOEA/D'], key=lambda x: algorithm_metrics[x]['execution_time'])}\n")
+    f.write(f"  Convergence Speed (higher is better): {max(['NSGA-II', 'SPEA2', 'MOEA/D'], key=lambda x: algorithm_metrics[x]['convergence_speed'])}\n\n")
+
+    f.write("Detailed Metrics:\n")
+    for alg, metrics in algorithm_metrics.items():
+        f.write(f"\n{alg}:\n")
+        for metric, value in metrics.items():
+            if isinstance(value, float):
+                f.write(f"  {metric}: {value:.6f}\n")
+            else:
+                f.write(f"  {metric}: {value}\n")
+print(f"\nStatistical analysis saved to {analysis_file}")
+
+# New research-quality visualizations with metrics
+print("\n--- Generating Research-Quality Visualizations with Metrics ---")
 research_pareto_path = create_research_quality_pareto(
     fitness_sets=[nsga2_pareto_fitness, spea2_pareto_fitness, moead_pareto_fitness],
     names=["NSGA-II", "SPEA2", "MOEA/D"],
@@ -2186,7 +2647,8 @@ research_pareto_path = create_research_quality_pareto(
     output_dir=OUTPUT_DIR_BASE,
     obj_x_index=0, obj_y_index=3,  # Professor Conflicts vs Unassigned Activities
     obj_x_label=objective_labels[0], obj_y_label=objective_labels[3],
-    execution_times=[nsga2_execution_time, spea2_execution_time, moead_execution_time]
+    execution_times=[nsga2_execution_time, spea2_execution_time, moead_execution_time],
+    metrics=algorithm_metrics  # Pass metrics to visualization function
 )
 
 # Create the clean, simple Pareto front with reference line
