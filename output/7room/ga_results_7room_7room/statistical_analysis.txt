@@ -1,0 +1,7 @@
+Best performing algorithm per metric:
+  Hypervolume (higher is better): MOEA/D
+  Spread (lower is better): SPEA2
+  Igd (lower is better): NSGA-II
+  Gd (lower is better): MOEA/D
+  Convergence_speed (higher is better): MOEA/D
+  Execution_time (lower is better): MOEA/D

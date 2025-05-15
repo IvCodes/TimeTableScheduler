@@ -1,0 +1,42 @@
+Statistical Analysis Results
+===========================
+
+Best performing algorithm per metric:
+  Hypervolume (higher is better): NSGA-II
+  IGD (lower is better): NSGA-II
+  GD (lower is better): MOEA/D
+  Spread (lower is better): MOEA/D
+  Execution Time (lower is better): SPEA2
+  Convergence Speed (higher is better): NSGA-II
+
+Detailed Metrics:
+
+NSGA-II:
+  pareto_size: 50
+  hypervolume: 6841.489537
+  igd: 0.000000
+  gd: 29.784654
+  spread: 0.927849
+  execution_time: 25.800411
+  memory_usage: 12.250000
+  convergence_speed: 265.169784
+
+SPEA2:
+  pareto_size: 50
+  hypervolume: 3250.637931
+  igd: 41.192583
+  gd: 40.906914
+  spread: 0.846017
+  execution_time: 23.508008
+  memory_usage: 4.734375
+  convergence_speed: 138.277898
+
+MOEA/D:
+  pareto_size: 71
+  hypervolume: 109.830915
+  igd: 8.826813
+  gd: 18.310796
+  spread: 0.841908
+  execution_time: 33.447795
+  memory_usage: 2.046875
+  convergence_speed: 3.283652

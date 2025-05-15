@@ -1,0 +1,1205 @@
+{
+  "NSGA-II": [
+    {
+      "professor_conflicts": 30,
+      "group_conflicts": 111,
+      "room_conflicts": 59,
+      "unassigned": 0.0,
+      "soft_score": 0.5324232895559724
+    },
+    {
+      "professor_conflicts": 0,
+      "group_conflicts": 0,
+      "room_conflicts": 0,
+      "unassigned": 19.0,
+      "soft_score": 0.4757446985446986
+    },
+    {
+      "professor_conflicts": 23,
+      "group_conflicts": 103,
+      "room_conflicts": 56,
+      "unassigned": 7.5,
+      "soft_score": 0.5558597591632025
+    },
+    {
+      "professor_conflicts": 14,
+      "group_conflicts": 133,
+      "room_conflicts": 46,
+      "unassigned": 17.0,
+      "soft_score": 0.4539368012074315
+    },
+    {
+      "professor_conflicts": 22,
+      "group_conflicts": 171,
+      "room_conflicts": 61,
+      "unassigned": 0.0,
+      "soft_score": 0.5328780487804877
+    },
+    {
+      "professor_conflicts": 30,
+      "group_conflicts": 111,
+      "room_conflicts": 59,
+      "unassigned": 0.0,
+      "soft_score": 0.5324232895559724
+    },
+    {
+      "professor_conflicts": 20,
+      "group_conflicts": 95,
+      "room_conflicts": 36,
+      "unassigned": 24.5,
+      "soft_score": 0.5215760424760425
+    },
+    {
+      "professor_conflicts": 7,
+      "group_conflicts": 11,
+      "room_conflicts": 8,
+      "unassigned": 18.5,
+      "soft_score": 0.5125044441342081
+    },
+    {
+      "professor_conflicts": 20,
+      "group_conflicts": 95,
+      "room_conflicts": 36,
+      "unassigned": 24.5,
+      "soft_score": 0.5215760424760425
+    },
+    {
+      "professor_conflicts": 18,
+      "group_conflicts": 73,
+      "room_conflicts": 42,
+      "unassigned": 16.5,
+      "soft_score": 0.5124434389140271
+    },
+    {
+      "professor_conflicts": 6,
+      "group_conflicts": 16,
+      "room_conflicts": 8,
+      "unassigned": 18.0,
+      "soft_score": 0.5072476044826317
+    },
+    {
+      "professor_conflicts": 12,
+      "group_conflicts": 115,
+      "room_conflicts": 48,
+      "unassigned": 15.0,
+      "soft_score": 0.4720072879762194
+    },
+    {
+      "professor_conflicts": 12,
+      "group_conflicts": 115,
+      "room_conflicts": 48,
+      "unassigned": 15.5,
+      "soft_score": 0.4907403440104374
+    },
+    {
+      "professor_conflicts": 19,
+      "group_conflicts": 99,
+      "room_conflicts": 43,
+      "unassigned": 19.5,
+      "soft_score": 0.5131898288483097
+    },
+    {
+      "professor_conflicts": 4,
+      "group_conflicts": 5,
+      "room_conflicts": 5,
+      "unassigned": 19.0,
+      "soft_score": 0.47912747392024957
+    },
+    {
+      "professor_conflicts": 3,
+      "group_conflicts": 7,
+      "room_conflicts": 4,
+      "unassigned": 19.5,
+      "soft_score": 0.4770558502799882
+    },
+    {
+      "professor_conflicts": 25,
+      "group_conflicts": 125,
+      "room_conflicts": 48,
+      "unassigned": 23.5,
+      "soft_score": 0.525875432122699
+    },
+    {
+      "professor_conflicts": 2,
+      "group_conflicts": 15,
+      "room_conflicts": 7,
+      "unassigned": 22.0,
+      "soft_score": 0.48442307692307685
+    },
+    {
+      "professor_conflicts": 16,
+      "group_conflicts": 141,
+      "room_conflicts": 51,
+      "unassigned": 8.0,
+      "soft_score": 0.5047296540588821
+    },
+    {
+      "professor_conflicts": 23,
+      "group_conflicts": 98,
+      "room_conflicts": 54,
+      "unassigned": 10.0,
+      "soft_score": 0.551720913033919
+    },
+    {
+      "professor_conflicts": 16,
+      "group_conflicts": 117,
+      "room_conflicts": 46,
+      "unassigned": 14.0,
+      "soft_score": 0.4945873259312512
+    },
+    {
+      "professor_conflicts": 21,
+      "group_conflicts": 166,
+      "room_conflicts": 59,
+      "unassigned": 0.5,
+      "soft_score": 0.5298392323422998
+    },
+    {
+      "professor_conflicts": 20,
+      "group_conflicts": 79,
+      "room_conflicts": 47,
+      "unassigned": 12.0,
+      "soft_score": 0.5181717218965916
+    },
+    {
+      "professor_conflicts": 29,
+      "group_conflicts": 106,
+      "room_conflicts": 58,
+      "unassigned": 1.0,
+      "soft_score": 0.5400715926844959
+    },
+    {
+      "professor_conflicts": 1,
+      "group_conflicts": 0,
+      "room_conflicts": 1,
+      "unassigned": 18.5,
+      "soft_score": 0.4756076923076923
+    },
+    {
+      "professor_conflicts": 15,
+      "group_conflicts": 127,
+      "room_conflicts": 47,
+      "unassigned": 13.0,
+      "soft_score": 0.48639748965220664
+    },
+    {
+      "professor_conflicts": 13,
+      "group_conflicts": 131,
+      "room_conflicts": 47,
+      "unassigned": 14.0,
+      "soft_score": 0.48786926100745176
+    },
+    {
+      "professor_conflicts": 20,
+      "group_conflicts": 77,
+      "room_conflicts": 45,
+      "unassigned": 14.5,
+      "soft_score": 0.49821911421911425
+    },
+    {
+      "professor_conflicts": 19,
+      "group_conflicts": 147,
+      "room_conflicts": 51,
+      "unassigned": 15.5,
+      "soft_score": 0.5211462412587412
+    },
+    {
+      "professor_conflicts": 15,
+      "group_conflicts": 135,
+      "room_conflicts": 52,
+      "unassigned": 15.5,
+      "soft_score": 0.4982150584007642
+    },
+    {
+      "professor_conflicts": 2,
+      "group_conflicts": 10,
+      "room_conflicts": 6,
+      "unassigned": 22.5,
+      "soft_score": 0.4844267151767152
+    },
+    {
+      "professor_conflicts": 16,
+      "group_conflicts": 132,
+      "room_conflicts": 48,
+      "unassigned": 12.5,
+      "soft_score": 0.4893674275915655
+    },
+    {
+      "professor_conflicts": 21,
+      "group_conflicts": 166,
+      "room_conflicts": 60,
+      "unassigned": 2.0,
+      "soft_score": 0.5309258564380515
+    },
+    {
+      "professor_conflicts": 14,
+      "group_conflicts": 136,
+      "room_conflicts": 49,
+      "unassigned": 11.0,
+      "soft_score": 0.5081143014650754
+    },
+    {
+      "professor_conflicts": 18,
+      "group_conflicts": 138,
+      "room_conflicts": 58,
+      "unassigned": 16.5,
+      "soft_score": 0.5169358116471681
+    },
+    {
+      "professor_conflicts": 22,
+      "group_conflicts": 168,
+      "room_conflicts": 58,
+      "unassigned": 4.5,
+      "soft_score": 0.5360536946026111
+    },
+    {
+      "professor_conflicts": 25,
+      "group_conflicts": 89,
+      "room_conflicts": 51,
+      "unassigned": 7.0,
+      "soft_score": 0.528768724985706
+    },
+    {
+      "professor_conflicts": 17,
+      "group_conflicts": 151,
+      "room_conflicts": 53,
+      "unassigned": 6.0,
+      "soft_score": 0.5090743038323683
+    },
+    {
+      "professor_conflicts": 6,
+      "group_conflicts": 16,
+      "room_conflicts": 8,
+      "unassigned": 18.0,
+      "soft_score": 0.5072476044826317
+    },
+    {
+      "professor_conflicts": 21,
+      "group_conflicts": 90,
+      "room_conflicts": 54,
+      "unassigned": 9.0,
+      "soft_score": 0.5362803030303029
+    },
+    {
+      "professor_conflicts": 22,
+      "group_conflicts": 86,
+      "room_conflicts": 50,
+      "unassigned": 9.0,
+      "soft_score": 0.5105819068659171
+    },
+    {
+      "professor_conflicts": 24,
+      "group_conflicts": 115,
+      "room_conflicts": 60,
+      "unassigned": 1.5,
+      "soft_score": 0.5451530520905521
+    },
+    {
+      "professor_conflicts": 2,
+      "group_conflicts": 10,
+      "room_conflicts": 7,
+      "unassigned": 22.0,
+      "soft_score": 0.4827179487179487
+    },
+    {
+      "professor_conflicts": 28,
+      "group_conflicts": 120,
+      "room_conflicts": 58,
+      "unassigned": 3.5,
+      "soft_score": 0.5436274937095615
+    },
+    {
+      "professor_conflicts": 27,
+      "group_conflicts": 96,
+      "room_conflicts": 55,
+      "unassigned": 3.0,
+      "soft_score": 0.5279615384615385
+    },
+    {
+      "professor_conflicts": 24,
+      "group_conflicts": 96,
+      "room_conflicts": 53,
+      "unassigned": 8.0,
+      "soft_score": 0.5174098595370147
+    },
+    {
+      "professor_conflicts": 17,
+      "group_conflicts": 151,
+      "room_conflicts": 53,
+      "unassigned": 6.0,
+      "soft_score": 0.5090743038323683
+    },
+    {
+      "professor_conflicts": 29,
+      "group_conflicts": 114,
+      "room_conflicts": 57,
+      "unassigned": 3.5,
+      "soft_score": 0.548057251691398
+    },
+    {
+      "professor_conflicts": 27,
+      "group_conflicts": 110,
+      "room_conflicts": 56,
+      "unassigned": 4.0,
+      "soft_score": 0.5460531874335753
+    },
+    {
+      "professor_conflicts": 28,
+      "group_conflicts": 104,
+      "room_conflicts": 55,
+      "unassigned": 4.0,
+      "soft_score": 0.5385560258376593
+    }
+  ],
+  "SPEA2": [
+    {
+      "professor_conflicts": 12,
+      "group_conflicts": 41,
+      "room_conflicts": 24,
+      "unassigned": 28.0,
+      "soft_score": 0.4678920049857551
+    },
+    {
+      "professor_conflicts": 8,
+      "group_conflicts": 46,
+      "room_conflicts": 23,
+      "unassigned": 26.5,
+      "soft_score": 0.4906394230769231
+    },
+    {
+      "professor_conflicts": 8,
+      "group_conflicts": 46,
+      "room_conflicts": 23,
+      "unassigned": 26.5,
+      "soft_score": 0.4906394230769231
+    },
+    {
+      "professor_conflicts": 8,
+      "group_conflicts": 46,
+      "room_conflicts": 23,
+      "unassigned": 26.5,
+      "soft_score": 0.4906394230769231
+    },
+    {
+      "professor_conflicts": 10,
+      "group_conflicts": 47,
+      "room_conflicts": 24,
+      "unassigned": 27.0,
+      "soft_score": 0.5134842467269559
+    },
+    {
+      "professor_conflicts": 10,
+      "group_conflicts": 47,
+      "room_conflicts": 24,
+      "unassigned": 27.0,
+      "soft_score": 0.5134842467269559
+    },
+    {
+      "professor_conflicts": 20,
+      "group_conflicts": 59,
+      "room_conflicts": 36,
+      "unassigned": 22.0,
+      "soft_score": 0.4584593534002228
+    },
+    {
+      "professor_conflicts": 12,
+      "group_conflicts": 70,
+      "room_conflicts": 29,
+      "unassigned": 25.5,
+      "soft_score": 0.48935657051282044
+    },
+    {
+      "professor_conflicts": 18,
+      "group_conflicts": 71,
+      "room_conflicts": 44,
+      "unassigned": 23.5,
+      "soft_score": 0.49843602693602695
+    },
+    {
+      "professor_conflicts": 27,
+      "group_conflicts": 168,
+      "room_conflicts": 58,
+      "unassigned": 10.5,
+      "soft_score": 0.5414452473452473
+    },
+    {
+      "professor_conflicts": 15,
+      "group_conflicts": 117,
+      "room_conflicts": 50,
+      "unassigned": 23.0,
+      "soft_score": 0.5237088768930873
+    },
+    {
+      "professor_conflicts": 14,
+      "group_conflicts": 87,
+      "room_conflicts": 34,
+      "unassigned": 21.0,
+      "soft_score": 0.504417576326113
+    },
+    {
+      "professor_conflicts": 25,
+      "group_conflicts": 163,
+      "room_conflicts": 56,
+      "unassigned": 11.5,
+      "soft_score": 0.5245795994129328
+    },
+    {
+      "professor_conflicts": 24,
+      "group_conflicts": 163,
+      "room_conflicts": 56,
+      "unassigned": 13.0,
+      "soft_score": 0.5317095832516394
+    },
+    {
+      "professor_conflicts": 18,
+      "group_conflicts": 128,
+      "room_conflicts": 53,
+      "unassigned": 27.0,
+      "soft_score": 0.5263798065581505
+    },
+    {
+      "professor_conflicts": 17,
+      "group_conflicts": 117,
+      "room_conflicts": 41,
+      "unassigned": 16.5,
+      "soft_score": 0.5094244496244497
+    },
+    {
+      "professor_conflicts": 17,
+      "group_conflicts": 117,
+      "room_conflicts": 41,
+      "unassigned": 16.5,
+      "soft_score": 0.5094244496244497
+    },
+    {
+      "professor_conflicts": 17,
+      "group_conflicts": 102,
+      "room_conflicts": 36,
+      "unassigned": 18.0,
+      "soft_score": 0.5045170026702843
+    },
+    {
+      "professor_conflicts": 25,
+      "group_conflicts": 85,
+      "room_conflicts": 48,
+      "unassigned": 17.0,
+      "soft_score": 0.4785363644584162
+    },
+    {
+      "professor_conflicts": 17,
+      "group_conflicts": 102,
+      "room_conflicts": 39,
+      "unassigned": 19.5,
+      "soft_score": 0.518286026962728
+    },
+    {
+      "professor_conflicts": 17,
+      "group_conflicts": 102,
+      "room_conflicts": 38,
+      "unassigned": 18.5,
+      "soft_score": 0.5138057865015263
+    },
+    {
+      "professor_conflicts": 15,
+      "group_conflicts": 92,
+      "room_conflicts": 35,
+      "unassigned": 20.5,
+      "soft_score": 0.5089865345765345
+    },
+    {
+      "professor_conflicts": 24,
+      "group_conflicts": 85,
+      "room_conflicts": 45,
+      "unassigned": 18.5,
+      "soft_score": 0.5010830797321972
+    },
+    {
+      "professor_conflicts": 15,
+      "group_conflicts": 92,
+      "room_conflicts": 35,
+      "unassigned": 20.5,
+      "soft_score": 0.5089865345765345
+    },
+    {
+      "professor_conflicts": 20,
+      "group_conflicts": 84,
+      "room_conflicts": 46,
+      "unassigned": 21.5,
+      "soft_score": 0.46143687813709877
+    },
+    {
+      "professor_conflicts": 16,
+      "group_conflicts": 97,
+      "room_conflicts": 38,
+      "unassigned": 20.0,
+      "soft_score": 0.5151767462422634
+    },
+    {
+      "professor_conflicts": 18,
+      "group_conflicts": 96,
+      "room_conflicts": 54,
+      "unassigned": 17.5,
+      "soft_score": 0.5046504953379953
+    },
+    {
+      "professor_conflicts": 18,
+      "group_conflicts": 96,
+      "room_conflicts": 54,
+      "unassigned": 17.5,
+      "soft_score": 0.5046504953379953
+    },
+    {
+      "professor_conflicts": 21,
+      "group_conflicts": 117,
+      "room_conflicts": 43,
+      "unassigned": 15.5,
+      "soft_score": 0.5074106449106449
+    },
+    {
+      "professor_conflicts": 21,
+      "group_conflicts": 117,
+      "room_conflicts": 43,
+      "unassigned": 15.5,
+      "soft_score": 0.5074106449106449
+    },
+    {
+      "professor_conflicts": 18,
+      "group_conflicts": 91,
+      "room_conflicts": 51,
+      "unassigned": 19.0,
+      "soft_score": 0.49073383325270115
+    },
+    {
+      "professor_conflicts": 22,
+      "group_conflicts": 154,
+      "room_conflicts": 59,
+      "unassigned": 22.0,
+      "soft_score": 0.5284143843772326
+    },
+    {
+      "professor_conflicts": 21,
+      "group_conflicts": 128,
+      "room_conflicts": 45,
+      "unassigned": 18.5,
+      "soft_score": 0.519997668997669
+    },
+    {
+      "professor_conflicts": 26,
+      "group_conflicts": 157,
+      "room_conflicts": 61,
+      "unassigned": 17.0,
+      "soft_score": 0.5324413976803749
+    },
+    {
+      "professor_conflicts": 26,
+      "group_conflicts": 157,
+      "room_conflicts": 61,
+      "unassigned": 17.0,
+      "soft_score": 0.5324413976803749
+    },
+    {
+      "professor_conflicts": 22,
+      "group_conflicts": 128,
+      "room_conflicts": 45,
+      "unassigned": 17.0,
+      "soft_score": 0.5271769098976409
+    },
+    {
+      "professor_conflicts": 25,
+      "group_conflicts": 158,
+      "room_conflicts": 55,
+      "unassigned": 11.5,
+      "soft_score": 0.5238558832471876
+    },
+    {
+      "professor_conflicts": 21,
+      "group_conflicts": 142,
+      "room_conflicts": 60,
+      "unassigned": 16.0,
+      "soft_score": 0.5271299544894847
+    },
+    {
+      "professor_conflicts": 21,
+      "group_conflicts": 142,
+      "room_conflicts": 60,
+      "unassigned": 16.0,
+      "soft_score": 0.5271299544894847
+    },
+    {
+      "professor_conflicts": 20,
+      "group_conflicts": 132,
+      "room_conflicts": 46,
+      "unassigned": 13.0,
+      "soft_score": 0.5109137596899225
+    },
+    {
+      "professor_conflicts": 23,
+      "group_conflicts": 142,
+      "room_conflicts": 49,
+      "unassigned": 11.0,
+      "soft_score": 0.516625089031339
+    },
+    {
+      "professor_conflicts": 23,
+      "group_conflicts": 142,
+      "room_conflicts": 49,
+      "unassigned": 11.0,
+      "soft_score": 0.516625089031339
+    },
+    {
+      "professor_conflicts": 24,
+      "group_conflicts": 122,
+      "room_conflicts": 60,
+      "unassigned": 11.5,
+      "soft_score": 0.5322029330200062
+    },
+    {
+      "professor_conflicts": 21,
+      "group_conflicts": 152,
+      "room_conflicts": 62,
+      "unassigned": 17.0,
+      "soft_score": 0.5294909919300161
+    },
+    {
+      "professor_conflicts": 21,
+      "group_conflicts": 152,
+      "room_conflicts": 62,
+      "unassigned": 17.0,
+      "soft_score": 0.5294909919300161
+    },
+    {
+      "professor_conflicts": 21,
+      "group_conflicts": 152,
+      "room_conflicts": 62,
+      "unassigned": 17.0,
+      "soft_score": 0.5294909919300161
+    },
+    {
+      "professor_conflicts": 26,
+      "group_conflicts": 144,
+      "room_conflicts": 57,
+      "unassigned": 21.0,
+      "soft_score": 0.5432065364079094
+    },
+    {
+      "professor_conflicts": 34,
+      "group_conflicts": 129,
+      "room_conflicts": 59,
+      "unassigned": 6.0,
+      "soft_score": 0.5366994347319347
+    },
+    {
+      "professor_conflicts": 34,
+      "group_conflicts": 129,
+      "room_conflicts": 59,
+      "unassigned": 6.0,
+      "soft_score": 0.5366994347319347
+    },
+    {
+      "professor_conflicts": 31,
+      "group_conflicts": 144,
+      "room_conflicts": 57,
+      "unassigned": 14.5,
+      "soft_score": 0.5406314561486975
+    }
+  ],
+  "MOEA/D": [
+    {
+      "professor_conflicts": 2,
+      "group_conflicts": 0,
+      "room_conflicts": 2,
+      "unassigned": 18.0,
+      "soft_score": 0.46404923076923077
+    },
+    {
+      "professor_conflicts": 0,
+      "group_conflicts": 0,
+      "room_conflicts": 0,
+      "unassigned": 19.0,
+      "soft_score": 0.4594550355267223
+    },
+    {
+      "professor_conflicts": 6,
+      "group_conflicts": 1,
+      "room_conflicts": 10,
+      "unassigned": 14.0,
+      "soft_score": 0.4767894091415831
+    },
+    {
+      "professor_conflicts": 3,
+      "group_conflicts": 2,
+      "room_conflicts": 9,
+      "unassigned": 15.0,
+      "soft_score": 0.47975064170589454
+    },
+    {
+      "professor_conflicts": 20,
+      "group_conflicts": 142,
+      "room_conflicts": 54,
+      "unassigned": 6.0,
+      "soft_score": 0.5079374044852727
+    },
+    {
+      "professor_conflicts": 7,
+      "group_conflicts": 11,
+      "room_conflicts": 12,
+      "unassigned": 13.0,
+      "soft_score": 0.4767477417331112
+    },
+    {
+      "professor_conflicts": 0,
+      "group_conflicts": 0,
+      "room_conflicts": 0,
+      "unassigned": 19.0,
+      "soft_score": 0.4594550355267223
+    },
+    {
+      "professor_conflicts": 2,
+      "group_conflicts": 0,
+      "room_conflicts": 2,
+      "unassigned": 18.0,
+      "soft_score": 0.46404923076923077
+    },
+    {
+      "professor_conflicts": 1,
+      "group_conflicts": 0,
+      "room_conflicts": 5,
+      "unassigned": 16.5,
+      "soft_score": 0.47479849170437405
+    },
+    {
+      "professor_conflicts": 5,
+      "group_conflicts": 6,
+      "room_conflicts": 10,
+      "unassigned": 14.0,
+      "soft_score": 0.47440259089569436
+    },
+    {
+      "professor_conflicts": 4,
+      "group_conflicts": 11,
+      "room_conflicts": 11,
+      "unassigned": 14.0,
+      "soft_score": 0.4717206911928651
+    },
+    {
+      "professor_conflicts": 0,
+      "group_conflicts": 0,
+      "room_conflicts": 0,
+      "unassigned": 19.0,
+      "soft_score": 0.4594550355267223
+    },
+    {
+      "professor_conflicts": 9,
+      "group_conflicts": 12,
+      "room_conflicts": 16,
+      "unassigned": 11.5,
+      "soft_score": 0.4776648762121116
+    },
+    {
+      "professor_conflicts": 8,
+      "group_conflicts": 2,
+      "room_conflicts": 13,
+      "unassigned": 13.0,
+      "soft_score": 0.4745686355706469
+    },
+    {
+      "professor_conflicts": 1,
+      "group_conflicts": 10,
+      "room_conflicts": 4,
+      "unassigned": 17.0,
+      "soft_score": 0.46310239432483524
+    },
+    {
+      "professor_conflicts": 9,
+      "group_conflicts": 12,
+      "room_conflicts": 16,
+      "unassigned": 11.5,
+      "soft_score": 0.4776648762121116
+    },
+    {
+      "professor_conflicts": 9,
+      "group_conflicts": 22,
+      "room_conflicts": 17,
+      "unassigned": 11.0,
+      "soft_score": 0.4758655483189579
+    },
+    {
+      "professor_conflicts": 9,
+      "group_conflicts": 2,
+      "room_conflicts": 14,
+      "unassigned": 12.5,
+      "soft_score": 0.47579185489443054
+    },
+    {
+      "professor_conflicts": 4,
+      "group_conflicts": 6,
+      "room_conflicts": 9,
+      "unassigned": 14.5,
+      "soft_score": 0.4751195489195489
+    },
+    {
+      "professor_conflicts": 7,
+      "group_conflicts": 16,
+      "room_conflicts": 15,
+      "unassigned": 12.0,
+      "soft_score": 0.47635024424850503
+    },
+    {
+      "professor_conflicts": 2,
+      "group_conflicts": 0,
+      "room_conflicts": 3,
+      "unassigned": 17.5,
+      "soft_score": 0.4646185897435897
+    },
+    {
+      "professor_conflicts": 5,
+      "group_conflicts": 25,
+      "room_conflicts": 11,
+      "unassigned": 13.5,
+      "soft_score": 0.4773126852790974
+    },
+    {
+      "professor_conflicts": 6,
+      "group_conflicts": 21,
+      "room_conflicts": 15,
+      "unassigned": 12.0,
+      "soft_score": 0.47635024424850503
+    },
+    {
+      "professor_conflicts": 9,
+      "group_conflicts": 12,
+      "room_conflicts": 16,
+      "unassigned": 11.5,
+      "soft_score": 0.4776648762121116
+    },
+    {
+      "professor_conflicts": 2,
+      "group_conflicts": 1,
+      "room_conflicts": 7,
+      "unassigned": 15.5,
+      "soft_score": 0.48784815705128204
+    },
+    {
+      "professor_conflicts": 5,
+      "group_conflicts": 25,
+      "room_conflicts": 11,
+      "unassigned": 13.5,
+      "soft_score": 0.4773126852790974
+    },
+    {
+      "professor_conflicts": 9,
+      "group_conflicts": 22,
+      "room_conflicts": 17,
+      "unassigned": 11.0,
+      "soft_score": 0.4758655483189579
+    },
+    {
+      "professor_conflicts": 7,
+      "group_conflicts": 11,
+      "room_conflicts": 12,
+      "unassigned": 13.0,
+      "soft_score": 0.4767477417331112
+    },
+    {
+      "professor_conflicts": 1,
+      "group_conflicts": 0,
+      "room_conflicts": 1,
+      "unassigned": 18.5,
+      "soft_score": 0.46315366852023476
+    },
+    {
+      "professor_conflicts": 10,
+      "group_conflicts": 17,
+      "room_conflicts": 17,
+      "unassigned": 11.0,
+      "soft_score": 0.47825570850202426
+    },
+    {
+      "professor_conflicts": 9,
+      "group_conflicts": 2,
+      "room_conflicts": 14,
+      "unassigned": 12.5,
+      "soft_score": 0.47579185489443054
+    },
+    {
+      "professor_conflicts": 7,
+      "group_conflicts": 16,
+      "room_conflicts": 15,
+      "unassigned": 12.0,
+      "soft_score": 0.47635024424850503
+    },
+    {
+      "professor_conflicts": 5,
+      "group_conflicts": 0,
+      "room_conflicts": 9,
+      "unassigned": 14.5,
+      "soft_score": 0.47583957663957654
+    },
+    {
+      "professor_conflicts": 2,
+      "group_conflicts": 0,
+      "room_conflicts": 2,
+      "unassigned": 18.0,
+      "soft_score": 0.46404923076923077
+    },
+    {
+      "professor_conflicts": 6,
+      "group_conflicts": 16,
+      "room_conflicts": 14,
+      "unassigned": 12.5,
+      "soft_score": 0.47525953550279554
+    },
+    {
+      "professor_conflicts": 9,
+      "group_conflicts": 12,
+      "room_conflicts": 16,
+      "unassigned": 11.5,
+      "soft_score": 0.4776648762121116
+    },
+    {
+      "professor_conflicts": 8,
+      "group_conflicts": 6,
+      "room_conflicts": 14,
+      "unassigned": 12.5,
+      "soft_score": 0.4813947515080339
+    },
+    {
+      "professor_conflicts": 5,
+      "group_conflicts": 11,
+      "room_conflicts": 11,
+      "unassigned": 13.5,
+      "soft_score": 0.4765988469545721
+    },
+    {
+      "professor_conflicts": 10,
+      "group_conflicts": 17,
+      "room_conflicts": 17,
+      "unassigned": 11.0,
+      "soft_score": 0.47825570850202426
+    },
+    {
+      "professor_conflicts": 4,
+      "group_conflicts": 6,
+      "room_conflicts": 9,
+      "unassigned": 14.5,
+      "soft_score": 0.4751195489195489
+    },
+    {
+      "professor_conflicts": 5,
+      "group_conflicts": 25,
+      "room_conflicts": 11,
+      "unassigned": 13.5,
+      "soft_score": 0.4773126852790974
+    },
+    {
+      "professor_conflicts": 2,
+      "group_conflicts": 0,
+      "room_conflicts": 4,
+      "unassigned": 17.0,
+      "soft_score": 0.47406809567244346
+    },
+    {
+      "professor_conflicts": 4,
+      "group_conflicts": 2,
+      "room_conflicts": 10,
+      "unassigned": 14.5,
+      "soft_score": 0.4812825120615818
+    },
+    {
+      "professor_conflicts": 9,
+      "group_conflicts": 2,
+      "room_conflicts": 14,
+      "unassigned": 12.5,
+      "soft_score": 0.47579185489443054
+    },
+    {
+      "professor_conflicts": 7,
+      "group_conflicts": 5,
+      "room_conflicts": 11,
+      "unassigned": 13.5,
+      "soft_score": 0.4805387412587413
+    },
+    {
+      "professor_conflicts": 5,
+      "group_conflicts": 25,
+      "room_conflicts": 11,
+      "unassigned": 13.5,
+      "soft_score": 0.4773126852790974
+    },
+    {
+      "professor_conflicts": 10,
+      "group_conflicts": 17,
+      "room_conflicts": 18,
+      "unassigned": 10.5,
+      "soft_score": 0.479180417747047
+    },
+    {
+      "professor_conflicts": 5,
+      "group_conflicts": 10,
+      "room_conflicts": 10,
+      "unassigned": 14.0,
+      "soft_score": 0.4827848484848485
+    },
+    {
+      "professor_conflicts": 9,
+      "group_conflicts": 12,
+      "room_conflicts": 16,
+      "unassigned": 11.5,
+      "soft_score": 0.4776648762121116
+    },
+    {
+      "professor_conflicts": 2,
+      "group_conflicts": 1,
+      "room_conflicts": 7,
+      "unassigned": 15.5,
+      "soft_score": 0.48784815705128204
+    },
+    {
+      "professor_conflicts": 7,
+      "group_conflicts": 1,
+      "room_conflicts": 12,
+      "unassigned": 13.5,
+      "soft_score": 0.48214569898569903
+    },
+    {
+      "professor_conflicts": 8,
+      "group_conflicts": 6,
+      "room_conflicts": 13,
+      "unassigned": 13.0,
+      "soft_score": 0.4762308566229706
+    },
+    {
+      "professor_conflicts": 1,
+      "group_conflicts": 1,
+      "room_conflicts": 2,
+      "unassigned": 18.0,
+      "soft_score": 0.47251025641025635
+    },
+    {
+      "professor_conflicts": 10,
+      "group_conflicts": 17,
+      "room_conflicts": 17,
+      "unassigned": 11.0,
+      "soft_score": 0.47825570850202426
+    },
+    {
+      "professor_conflicts": 9,
+      "group_conflicts": 22,
+      "room_conflicts": 17,
+      "unassigned": 11.0,
+      "soft_score": 0.4758655483189579
+    },
+    {
+      "professor_conflicts": 2,
+      "group_conflicts": 0,
+      "room_conflicts": 2,
+      "unassigned": 18.0,
+      "soft_score": 0.46404923076923077
+    },
+    {
+      "professor_conflicts": 9,
+      "group_conflicts": 12,
+      "room_conflicts": 16,
+      "unassigned": 11.5,
+      "soft_score": 0.4776648762121116
+    },
+    {
+      "professor_conflicts": 9,
+      "group_conflicts": 12,
+      "room_conflicts": 16,
+      "unassigned": 11.5,
+      "soft_score": 0.4776648762121116
+    },
+    {
+      "professor_conflicts": 2,
+      "group_conflicts": 0,
+      "room_conflicts": 3,
+      "unassigned": 17.5,
+      "soft_score": 0.4646185897435897
+    },
+    {
+      "professor_conflicts": 2,
+      "group_conflicts": 0,
+      "room_conflicts": 6,
+      "unassigned": 16.0,
+      "soft_score": 0.4761123397435898
+    },
+    {
+      "professor_conflicts": 5,
+      "group_conflicts": 5,
+      "room_conflicts": 9,
+      "unassigned": 14.5,
+      "soft_score": 0.4765856648777579
+    },
+    {
+      "professor_conflicts": 4,
+      "group_conflicts": 0,
+      "room_conflicts": 8,
+      "unassigned": 15.0,
+      "soft_score": 0.4806234201336925
+    },
+    {
+      "professor_conflicts": 5,
+      "group_conflicts": 6,
+      "room_conflicts": 10,
+      "unassigned": 14.0,
+      "soft_score": 0.47440259089569436
+    },
+    {
+      "professor_conflicts": 8,
+      "group_conflicts": 2,
+      "room_conflicts": 13,
+      "unassigned": 13.0,
+      "soft_score": 0.4745686355706469
+    },
+    {
+      "professor_conflicts": 3,
+      "group_conflicts": 5,
+      "room_conflicts": 8,
+      "unassigned": 15.0,
+      "soft_score": 0.47953392597026834
+    },
+    {
+      "professor_conflicts": 7,
+      "group_conflicts": 20,
+      "room_conflicts": 13,
+      "unassigned": 12.5,
+      "soft_score": 0.4892691417996762
+    },
+    {
+      "professor_conflicts": 1,
+      "group_conflicts": 0,
+      "room_conflicts": 5,
+      "unassigned": 16.5,
+      "soft_score": 0.47479849170437405
+    },
+    {
+      "professor_conflicts": 5,
+      "group_conflicts": 6,
+      "room_conflicts": 10,
+      "unassigned": 14.0,
+      "soft_score": 0.47440259089569436
+    },
+    {
+      "professor_conflicts": 3,
+      "group_conflicts": 5,
+      "room_conflicts": 6,
+      "unassigned": 16.0,
+      "soft_score": 0.47717495255400766
+    },
+    {
+      "professor_conflicts": 9,
+      "group_conflicts": 7,
+      "room_conflicts": 15,
+      "unassigned": 12.0,
+      "soft_score": 0.476880547278808
+    },
+    {
+      "professor_conflicts": 0,
+      "group_conflicts": 0,
+      "room_conflicts": 0,
+      "unassigned": 19.0,
+      "soft_score": 0.4594550355267223
+    }
+  ]
+}

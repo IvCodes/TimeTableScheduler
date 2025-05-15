@@ -96,8 +96,9 @@ def load_data(dataset_path=None):
         if env_path and os.path.exists(env_path):
             dataset_path = env_path
         else:
-            # Try various common locations
+            # Try various common locations (including balanced datasets)
             possible_paths = [
+                # Original datasets
                 os.path.join(os.getcwd(), 'sliit_computing_dataset.json'),
                 os.path.join(os.getcwd(), 'sliit_computing_dataset_7.json'),
                 os.path.join(os.getcwd(), 'data', 'sliit_computing_dataset.json'),
@@ -108,10 +109,18 @@ def load_data(dataset_path=None):
                 os.path.join(os.getcwd(), '..', 'data', 'sliit_computing_dataset_7.json'),
                 os.path.join(os.getcwd(), '..', 'Dataset', 'sliit_computing_dataset.json'),
                 os.path.join(os.getcwd(), '..', 'Dataset', 'sliit_computing_dataset_7.json'),
-                os.path.join(os.getcwd(), '..', '..', 'data', 'sliit_computing_dataset.json'),
-                os.path.join(os.getcwd(), '..', '..', 'data', 'sliit_computing_dataset_7.json'),
-                os.path.join(os.getcwd(), '..', '..', 'Dataset', 'sliit_computing_dataset.json'),
-                os.path.join(os.getcwd(), '..', '..', 'Dataset', 'sliit_computing_dataset_7.json'),
+                
+                # Balanced datasets
+                os.path.join(os.getcwd(), 'sliit_computing_dataset_4_balanced.json'),
+                os.path.join(os.getcwd(), 'sliit_computing_dataset_7_balanced.json'),
+                os.path.join(os.getcwd(), 'data', 'sliit_computing_dataset_4_balanced.json'),
+                os.path.join(os.getcwd(), 'data', 'sliit_computing_dataset_7_balanced.json'),
+                os.path.join(os.getcwd(), 'Dataset', 'sliit_computing_dataset_4_balanced.json'),
+                os.path.join(os.getcwd(), 'Dataset', 'sliit_computing_dataset_7_balanced.json'),
+                os.path.join(os.getcwd(), '..', 'data', 'sliit_computing_dataset_4_balanced.json'),
+                os.path.join(os.getcwd(), '..', 'data', 'sliit_computing_dataset_7_balanced.json'),
+                os.path.join(os.getcwd(), '..', 'Dataset', 'sliit_computing_dataset_4_balanced.json'),
+                os.path.join(os.getcwd(), '..', 'Dataset', 'sliit_computing_dataset_7_balanced.json'),
             ]
             
             for path in possible_paths:

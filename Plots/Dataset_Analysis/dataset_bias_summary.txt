@@ -1,0 +1,48 @@
+Dataset Bias Analysis Summary: sliit_computing_dataset_7.json
+================================================================================
+
+Basic Statistics:
+  • Activities: 195
+  • Groups: 40
+  • Lecturers: 0
+  • Spaces (Rooms): 7
+  • Total Activity Hours: 240
+  • Available Room Hours: 280
+  • Utilization Rate: 85.7%
+
+Identified Potential Biases:
+
+1. Lecturer Workload Distribution Bias
+   • Some lecturers have significantly higher teaching loads
+   • 0.0% of lecturers have >50% higher than average teaching load
+   • Variance in teaching hours: 0.00
+   • Implication: Algorithms may favor certain lecturers, creating unfair workload distribution
+
+2. Room Capacity Constraints Bias
+   • 0.0% of activities require more capacity than available rooms
+   • Minimum rooms needed: 6.0 (Available: 7)
+   • Implication: Creates bottlenecks for large group activities, potentially favoring
+     algorithms that prioritize large group assignments over conflict resolution
+
+Implications for Algorithm Comparison:
+
+• Genetic Algorithms (GA):
+  - Advantage: Can encode complex constraints and handle multi-objective optimization
+  - Bias impact: May struggle with instructor workload imbalance unless explicitly encoded
+  - May find local optima that unfairly burden certain instructors
+
+• Reinforcement Learning (RL):
+  - Advantage: Can learn adaptively which constraints to prioritize
+  - Bias impact: Reward function must explicitly account for workload distribution
+  - SARSA may perform better than expected due to more conservative policy updates
+
+• Colony Optimization (CO):
+  - Advantage: Good at finding paths through constraint-rich spaces
+  - Bias impact: May fixate on easy assignments first, leaving difficult combinations
+  - Pheromone trails might reinforce unfair lecturer allocations
+
+Conclusion:
+This analysis reveals significant biases in the dataset that could impact algorithm performance.
+Fair comparison requires metrics that account for these biases, particularly workload distribution
+and handling of capacity constraints. The extreme scenario (4 rooms for 195 activities) creates
+artificial bottlenecks that may favor algorithms with certain characteristics.
